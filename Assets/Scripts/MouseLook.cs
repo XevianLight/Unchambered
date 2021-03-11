@@ -90,12 +90,7 @@ public class MouseLook : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (heldObject)
-        {
-            // Gets a velocity vector based on delta position and applies it to the rigidbody. Used for kinematic velocity.
-            heldObjectVelocity = (heldObject.transform.position - heldObjectPositionOld) / Time.deltaTime;
-            heldObject.GetComponent<Rigidbody>().velocity = heldObjectVelocity;
-        }
+
     }
 
     // Update is called once per frame
@@ -107,10 +102,17 @@ public class MouseLook : MonoBehaviour
         // Set a temporary variable for the getObjectHit function
         objectHit = getObjectHit(Camera.main.transform.position, Camera.main.transform.forward, range);
         //Debug.Log(getObjectHit(Camera.main.transform.position, Camera.main.transform.forward, range).name);
-
+        if (heldObject)
+        {
+            // Gets a velocity vector based on delta position and applies it to the rigidbody. Used for kinematic velocity.
+            heldObjectVelocity = (heldObject.transform.position - heldObjectPositionOld) / Time.deltaTime;
+            heldObject.GetComponent<Rigidbody>().velocity = heldObjectVelocity;
+        }
         if (Input.GetMouseButtonDown(0))
         {
             //Debug.Log(1);
+
+
 
             // Does the object exist and can it be picked up
             if (objectHit != null && canBePickedUp)
@@ -210,39 +212,88 @@ public class MouseLook : MonoBehaviour
                     out rotationVector,
                     out finalPosition))
                 {
+                    //Debug.Log(endpoint);
                     // If the boxcast hit an object, attempt to move the held object towards point without intersecting
-
+                    //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
+                    //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
+                    bool allowSnap = true;
                     Debug.DrawLine(Camera.main.transform.position, hit.point);
+                    if (cs.connectedAreas.Length > 0)
+                    {
+                        foreach (Collider c in cs.connectedAreas)
+                        {
+                            if (c.bounds.Contains(endpoint))
+                            {
+                                allowSnap = false;
+                            }
+                            else
+                            {
+                                allowSnap = true;
+                            }
+                        }
+                    }
 
                     // If the object is too far away, set position instead of lerp
-                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= range * cs.lossyScale.x)
+                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= 2 * range * cs.lossyScale)
                     {
                         heldObject.transform.position = Vector3.Lerp(
                             heldObject.transform.position,
                             finalPosition + rotationVector.transform.forward * hit.distance,
-                            snapSpeed * Time.deltaTime / cs.lossyScale.x);
+                            snapSpeed * Time.deltaTime/* / cs.lossyScale*/);
                     }
 
                     else
                     {
-                        heldObject.transform.position = endpoint;
+                        if (allowSnap)
+                        {
+                            heldObject.transform.position = endpoint;
+                            Debug.Log("Snapped position as distance was greater than max");
+                        }
+                        else
+                        {
+                            Debug.Log("Object snapping was denied");
+                        }
                     }
                 }
                 else
                 {
+                    //Debug.Log(endpoint);
+                    bool allowSnap = true;
+                    if (cs.connectedAreas.Length > 0)
+                    {
+                        foreach(Collider c in cs.connectedAreas) {
+                            if (c.bounds.Contains(endpoint))
+                            {
+                                allowSnap = false;
+                            }
+                            else
+                            {
+                                allowSnap = true;
+                            }
+                        }
+                    }
                     // Otherwise, hold the object at a fixed distance from the boxcasts origin
-
+                    //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
+                    //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
                     // If the object is too far away, set position instead of lerp
-                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= range * cs.lossyScale.x)
+                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= 2 * range * cs.lossyScale && allowSnap)
                     {
                         heldObject.transform.position = Vector3.Lerp(
                             heldObject.transform.position,
                             endpoint,
-                            snapSpeed * Time.deltaTime / cs.lossyScale.x);
+                            snapSpeed * Time.deltaTime/* / cs.lossyScale*/);
                     }
                     else
                     {
-                        heldObject.transform.position = endpoint;
+                        if (allowSnap)
+                        {
+                            heldObject.transform.position = endpoint;
+                            Debug.Log("Snapped position as distance was greater than max");
+                        }
+                        else
+                        {
+                            Debug.Log("Object snapping was denied");
+                        }
                     }
                     //heldObject.transform.position = Vector3.Lerp(heldObject.transform.position, Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, (rangeIfNotHit))), snapSpeed * Time.deltaTime / heldObject.transform.lossyScale.magnitude);
 
@@ -447,7 +498,7 @@ public class MouseLook : MonoBehaviour
         Vector3 rayDirection = Camera.main.transform.forward;
         RaycastHit hit;
         Vector3 rayOrigin;
-        if (Portal.RaycastRecursive(Camera.main.transform.position, rayDirection, range, ~(ignorePickupLayer | (1 << 2) | (1 << 11)), 8, out endpoint, out hit, out rotationVector, out rayOrigin)) //Cast out a ray returns the gameobject of the collider hit
+        if (Portal.RaycastRecursive(Camera.main.transform.position, rayDirection, range, ~(ignorePickupLayer | (1 << 2) | (1 << 11) | (1 << 17)), 8, out endpoint, out hit, out rotationVector, out rayOrigin)) //Cast out a ray returns the gameobject of the collider hit
         {
             Debug.DrawLine(Camera.main.transform.position, hit.point, new Color(0, 255, 0));
             hitPoint = hit.point;
@@ -466,6 +517,7 @@ public class MouseLook : MonoBehaviour
         else
         {
             Debug.DrawLine(rayOrigin, endpoint, new Color(255, 0, 0));
+            Debug.DrawLine(Camera.main.transform.position, endpoint, new Color(255, 0, 0));
             return null;
         }
     }

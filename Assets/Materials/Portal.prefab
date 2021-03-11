@@ -87,6 +87,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -128,8 +129,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 0.1}
-  m_Center: {x: 0, y: 0, z: -0.05}
+  m_Size: {x: 1, y: 1, z: 0.005}
+  m_Center: {x: 0, y: 0, z: -0.005}
 --- !u!64 &1158158067693326261
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -164,8 +165,8 @@ MonoBehaviour:
   initialMaterial: {fileID: 0}
   visiblePortals: []
   viewthroughDefaultTexture: {fileID: 0}
-  orientRay: {fileID: 8183519293883499631}
   maxRecursionsOverride: -1
+  debugAllowRecrusiveRaycasts: 1
 --- !u!1 &7746751437200047728
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,10 +8,10 @@ public class BoxScript : MonoBehaviour
     public Mesh outsideMesh;
     public Material insideMat;
     public Material outsideMat;
-	public bool occupied = false;
+    public bool occupied = false;
+    public bool forceOut = false;
     MeshFilter meshF;
     MeshRenderer meshR;
-    public int occupants = 0;
 
 
     // Start is called before the first frame update
@@ -23,11 +23,12 @@ public class BoxScript : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-	{
-		if (transform.childCount <= 0){
-			occupied = false;
-		}
-    	
+    {
+        if (transform.childCount <= 0)
+        {
+            occupied = false;
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -49,6 +50,17 @@ public class BoxScript : MonoBehaviour
         {
             meshF.mesh = outsideMesh;
             meshR.material = outsideMat;
+        }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (forceOut)
+        {
+            if (!other.CompareTag("MainCamera") && other.transform.parent != gameObject)
+            {
+                if (other.GetComponent<Rigidbody>())
+                    other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+            }
         }
     }
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEditor;
-using Assets.Scripts;
 using RenderPipeline = UnityEngine.Rendering.RenderPipelineManager;
 
 
@@ -40,7 +39,7 @@ public class Portal : MonoBehaviour
     static GameObject orientRay;
 
     public int maxRecursionsOverride = -1;
-
+    public bool allowRecursiveRaycasts = true;
     bool run = false;
 
     public Plane plane;
@@ -156,7 +155,7 @@ public class Portal : MonoBehaviour
             rb.velocity = targetPortal.transform.TransformDirection(relVelocity);
             var newPosition = TransformPositionBetweenPortals(this, targetPortal, portalableObject.transform.position);
             var newRotation = TransformRotationBetweenPortals(this, targetPortal, portalableObject.transform.rotation);
-            Debug.Log(newRotation.eulerAngles);
+            //Debug.Log(newRotation.eulerAngles);
             //Debug.Log(newRotation);
             if (portalableObject.tag == "Player")
             {
@@ -200,18 +199,18 @@ public class Portal : MonoBehaviour
         out Vector3 finalPosition
         )
     {
-        return RaycastRecursiveInternal(
-            position,
-            direction,
-            maxRange,
-            layerMask,
-            maxRecursions,
-            out endpoint,
-            out hitInfo,
-            out finalDirectionObj,
-            out finalPosition,
-            0,
-            null);
+            return RaycastRecursiveInternal(
+                position,
+                direction,
+                maxRange,
+                layerMask,
+                maxRecursions,
+                out endpoint,
+                out hitInfo,
+                out finalDirectionObj,
+                out finalPosition,
+                0,
+                null);
     }
 
     private static bool RaycastRecursiveInternal(
@@ -239,7 +238,14 @@ public class Portal : MonoBehaviour
         }
 
         // Shoot raycast
-
+        //if (portal.allowRecursiveRaycasts)
+        //{
+        //    layerMask = ~layerMask & ~(1 << 16);
+        //}
+        //else
+        //{
+        //    layerMask = ~layerMask | (1 << 16);
+        //}
         var raycastHitSomething = Physics.Raycast(
             position,
             direction,
@@ -266,9 +272,8 @@ public class Portal : MonoBehaviour
         }
 
         // If the object hit is a portal, recurse, unless we are already at max recursions
-
         var portal = hit.collider.GetComponent<Portal>();
-        if (portal)
+        if (portal && portal.allowRecursiveRaycasts)
         {
             if (currentRecursion >= maxRecursions)
             {
@@ -353,6 +358,7 @@ public class Portal : MonoBehaviour
         int currentRecursion,
         GameObject ignoreObject)
     {
+        
         // Ignore a specific object when raycasting.
         // Useful for preventing a raycast through a portal from hitting the target portal from the back,
         // which makes a raycast unable to go through a portal since it'll just be absorbed by the target portal's trigger.
@@ -365,7 +371,14 @@ public class Portal : MonoBehaviour
         }
 
         // Shoot raycast
-
+        //if (portal.allowRecursiveRaycasts)
+        //{
+        //    layerMask = ~layerMask & ~(1 << 16);
+        //}
+        //else
+        //{
+        //    layerMask = ~layerMask | (1 << 16);
+        //}
         var raycastHitSomething = Physics.Raycast(
             position,
             direction,
@@ -415,7 +428,7 @@ public class Portal : MonoBehaviour
             }
             else
             {
-                Debug.Log("BoxHit");
+                //Debug.Log("BoxHit");
                 endpoint = position + direction * (maxRange);
                 hitInfo = hit2;
                 Debug.DrawLine(position, endpoint, new Color(0, 0, 255));
@@ -449,7 +462,7 @@ public class Portal : MonoBehaviour
             var portalTemp = hit.collider.GetComponent<Portal>();
             if (boxCastHitSomething2 && !portalTemp)
             {
-                Debug.Log("BoxHit");
+                //Debug.Log("BoxHit");
                 endpoint = position + direction * (maxRange);
                 hitInfo = hit3;
                 Debug.DrawLine(position, endpoint, new Color(0, 0, 255));
@@ -463,9 +476,8 @@ public class Portal : MonoBehaviour
         }
 
         // If the object hit is a portal, recurse, unless we are already at max recursions
-
         var portal = hit.collider.GetComponent<Portal>();
-        if (portal)
+        if (portal && portal.allowRecursiveRaycasts)
         {
             if (currentRecursion >= maxRecursions)
             {
@@ -518,7 +530,7 @@ public class Portal : MonoBehaviour
 
         if (boxCastHitSomething3)
         {
-            Debug.Log("BoxHit");
+            //Debug.Log("BoxHit");
             hitInfo = hit4;
             endpoint = position + (direction * (hit.distance));
             Debug.DrawLine(position, endpoint);
@@ -532,7 +544,7 @@ public class Portal : MonoBehaviour
         }
         else
         {
-            Debug.Log("BoxNotHit");
+            //Debug.Log("BoxNotHit");
             hitInfo = new RaycastHit(); // Dummy
             endpoint = position + (direction * (maxRange));
             orientRay.transform.position = position;
@@ -546,6 +558,26 @@ public class Portal : MonoBehaviour
     void UpdateCamera(ScriptableRenderContext SRC, Camera camera)
     {
         SRCTemp = SRC;
+    }
+
+    private void Update()
+    {
+        if (transform.parent)
+        {
+            if (transform.parent.GetComponent<CubeScript>())
+            {
+                if (transform.parent.GetComponent<CubeScript>().held)
+                {
+                    gameObject.layer = 2;
+                    allowRecursiveRaycasts = false;
+                }
+                else
+                {
+                    gameObject.layer = 16;
+                    allowRecursiveRaycasts = true;
+                }
+            }
+        }
     }
 
     /*private void Update()
@@ -710,9 +742,6 @@ public class Portal : MonoBehaviour
         if (portalableObject)
         {
             objectsInPortal.Add(portalableObject);
-            Instantiate(Slicer.Slice(plane, other.gameObject)[0], new Vector3(0, 10, 0), Quaternion.identity);
-            Instantiate(Slicer.Slice(plane, other.gameObject)[1], new Vector3(0, 10, 0), Quaternion.identity);
-            Debug.Log(Slicer.Slice(plane, portalableObject.gameObject)[1].name);
         }
     }
 
@@ -760,20 +789,7 @@ public class Portal : MonoBehaviour
 
     void LateUpdate()
     {
-        if (transform.parent)
-        {
-            if (transform.parent.GetComponent<CubeScript>())
-            {
-                if (transform.parent.GetComponent<CubeScript>().held)
-                {
-                    gameObject.layer = 2;
-                }
-                else
-                {
-                    gameObject.layer = 16;
-                }
-            }
-        }
+        
         // Calculate virtual camera position and rotation
 
         var virtualPosition = TransformPositionBetweenPortals(this, targetPortal, refPos);
@@ -807,7 +823,7 @@ public class Portal : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Debug.Log("If this log does not appear, exit unity immediately");
+        //Debug.Log("If this log does not appear, exit unity immediately");
         run = false;
         StopCoroutine(WaitForFixedUpdateLoop());
         this.GetComponent<Portal>().enabled = false;
