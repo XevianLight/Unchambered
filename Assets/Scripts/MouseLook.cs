@@ -234,12 +234,12 @@ public class MouseLook : MonoBehaviour
                     }
 
                     // If the object is too far away, set position instead of lerp
-                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= 2 * range * cs.lossyScale)
+                    if (Vector3.Distance(heldObject.transform.position, endpoint) <= 2 * range * cs.lossyScale && allowSnap)
                     {
-                        heldObject.transform.position = Vector3.Lerp(
+                        heldObject.transform.position = Vector3.LerpUnclamped(
                             heldObject.transform.position,
-                            finalPosition + rotationVector.transform.forward * hit.distance,
-                            snapSpeed * Time.deltaTime/* / cs.lossyScale*/);
+                            finalPosition + (rotationVector.transform.forward * Mathf.Clamp(cs.lossyScale, 1, 100)) * hit.distance,
+                            Time.deltaTime * snapSpeed/cs.lossyScale);
                     }
 
                     else
@@ -278,10 +278,10 @@ public class MouseLook : MonoBehaviour
                     // If the object is too far away, set position instead of lerp
                     if (Vector3.Distance(heldObject.transform.position, endpoint) <= 2 * range * cs.lossyScale && allowSnap)
                     {
-                        heldObject.transform.position = Vector3.Lerp(
+                        heldObject.transform.position = Vector3.Slerp(
                             heldObject.transform.position,
                             endpoint,
-                            snapSpeed * Time.deltaTime/* / cs.lossyScale*/);
+                            Time.deltaTime * snapSpeed/cs.lossyScale);
                     }
                     else
                     {

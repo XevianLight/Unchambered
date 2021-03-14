@@ -620,8 +620,7 @@ public class Portal : MonoBehaviour
         // Convert target portal's plane to camera space (relative to target camera)
 
         var targetViewThroughPlaneCameraSpace =
-            Matrix4x4.Transpose(Matrix4x4.Inverse(portalCamera.worldToCameraMatrix))
-            * targetPortal.vectorPlane;
+            Matrix4x4.Transpose(Matrix4x4.Inverse(portalCamera.worldToCameraMatrix)) * targetPortal.vectorPlane;
 
         // Set portal camera projection matrix to clip walls between target portal and target camera
         // Inherits main camera near/far clip plane and FOV settings
@@ -687,7 +686,6 @@ public class Portal : MonoBehaviour
         portalCamera.projectionMatrix = obliqueProjectionMatrix;
 
         // Render portal camera to target texture
-
         UniversalRenderPipeline.RenderSingleCamera(SRC, portalCamera);
 
         // Reset and release

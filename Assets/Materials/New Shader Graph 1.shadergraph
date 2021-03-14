@@ -107,6 +107,9 @@
         },
         {
             "m_Id": "89a0492e56fc4a3ab7904e832655f369"
+        },
+        {
+            "m_Id": "7c5d494024184cc290beb36c964ca83d"
         }
     ],
     "m_GroupDatas": [],
@@ -164,6 +167,20 @@
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "8fb29cd2de674d479750ab24cf16eb89"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "7c5d494024184cc290beb36c964ca83d"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "771a8ea9cff74367aa1a0416380d2497"
                 },
                 "m_SlotId": 0
             }
@@ -396,6 +413,8 @@
         "m_GuidSerialized": "5964636a-fe4b-4b32-9cf8-b74433650b68"
     },
     "m_Name": "Fresnel",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_0096c1bb401a46f0b26499e9d051d26f",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -491,6 +510,8 @@
         "m_GuidSerialized": "cfda6de8-d6f4-4ca5-9131-d84d4a767bd7"
     },
     "m_Name": "Emmision",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Color_0daf46075442431c84e5e6347603034b",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -656,6 +677,8 @@
         "m_GuidSerialized": "72915ec6-88ef-4d42-ba8a-5ea74821b07c"
     },
     "m_Name": "Offset",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_1a70ff0894604171b5b87bc517347b5a",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1044,6 +1067,8 @@
         "m_GuidSerialized": "a745a9a4-2584-4708-80af-1bde2c236215"
     },
     "m_Name": "Texture2D",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_4e27d2b7c7c447edbe43bdc57bbc06e1",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1134,6 +1159,8 @@
         "m_GuidSerialized": "4cee91a8-9f0a-449f-9d49-503f9be128a1"
     },
     "m_Name": "Speed",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_69afaff92ce945d182569d853919490e",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1283,6 +1310,8 @@
         "m_GuidSerialized": "357d6542-57c6-4109-9d02-12b073318253"
     },
     "m_Name": "Texture2D (2)",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_752a950f025a4a9898ceed6321f0b659",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1328,6 +1357,38 @@
         },
         {
             "m_Id": "c9f2d14b7f4b49e68510b4d39833bd14"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.IsFrontFaceNode",
+    "m_ObjectId": "7c5d494024184cc290beb36c964ca83d",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Is Front Face",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -303.99993896484377,
+            "y": -117.99999237060547,
+            "width": 118.99999237060547,
+            "height": 77.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "ea9b30faa17b40028fdef705db7d624e"
         }
     ],
     "synonyms": [],
@@ -1598,6 +1659,8 @@
         "m_GuidSerialized": "b48b2bfb-0643-45ef-a914-defcf9d6a907"
     },
     "m_Name": "Tiling",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector2_9ad992182f7b4a4b93c5a37a56008426",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1815,6 +1878,8 @@
         "m_GuidSerialized": "76087515-f4e2-430a-b7f9-2c923eca40fc"
     },
     "m_Name": "Fill",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_b5bfa532b3b140e2b0eef9799b81badd",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -2118,7 +2183,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Predicate",
     "m_StageCapability": 3,
-    "m_Value": false,
+    "m_Value": true,
     "m_DefaultValue": false
 }
 
@@ -2194,7 +2259,7 @@
     },
     "m_SurfaceType": 1,
     "m_AlphaMode": 0,
-    "m_TwoSided": false,
+    "m_TwoSided": true,
     "m_AlphaClip": false,
     "m_CustomEditorGUI": ""
 }
@@ -2438,6 +2503,20 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
+    "m_ObjectId": "ea9b30faa17b40028fdef705db7d624e",
+    "m_Id": 0,
+    "m_DisplayName": "Out",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 2,
+    "m_Value": true,
+    "m_DefaultValue": true
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.SubtractNode",
     "m_ObjectId": "ec63318c549b4d1da448308d595b6867",
     "m_Group": {
@@ -2533,6 +2612,8 @@
         "m_GuidSerialized": "d5d64322-a4ca-424c-83b4-8b481c8a310f"
     },
     "m_Name": "Texture2D (1)",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_f822ecc35bf84f2db242ee6e2a8681b7",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,

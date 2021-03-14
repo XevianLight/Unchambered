@@ -59,7 +59,9 @@ public class BoxScript : MonoBehaviour
             if (!other.CompareTag("MainCamera") && other.transform.parent != gameObject)
             {
                 if (other.GetComponent<Rigidbody>())
-                    other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+                {
+                    other.GetComponent<Rigidbody>().AddExplosionForce(100f, new Vector3(transform.position.x, Camera.main.transform.position.y, transform.position.z), transform.localScale.magnitude);
+                }
             }
         }
     }

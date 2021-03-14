@@ -9,6 +9,8 @@ Shader "Custom/Portal Viewthrough"{
         //the material is completely non-transparent and is rendered at the same time as the other opaque geometry
         Tags{ "RenderType" = "Opaque" "Queue" = "Geometry"}
 		//Cull off
+        ZWrite On
+        ZTest LEqual
         Pass{
             CGPROGRAM
             

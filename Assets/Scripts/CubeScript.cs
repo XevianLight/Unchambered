@@ -8,9 +8,13 @@ public class CubeScript : MonoBehaviour
     Rigidbody rb;
     public Vector3 targetRotation = Vector3.zero;
     public Vector3 targetPosition = Vector3.zero;
+    public Vector3 defaultScale;
     public float targetScale;
+    public Vector3 initialPosition;
+    public Quaternion initialRotation;
     public Vector3 initialScale;
-    public float inverseScaleFactor = 1;
+    public Vector3 endScale;
+    public float scaleFactor = 1;
     public float lossyScale;
     public float snapAngle = 90f;
     public bool held = false;
@@ -20,15 +24,15 @@ public class CubeScript : MonoBehaviour
     public GameObject areaObject;
     //public PostProcessVolume postProcessVolume;
     //private ChromaticAberration ca;
-    float dampVel;
+    //float dampVel;
     public Light lt;
     public float lightModifier = 1f;
-    Vector3 scale;
+    //Vector3 scale;
     public int occupants = 0;
     public int initialColliderCount = 1;
     public int colliderCount = 1;
     public bool childColliders = false;
-    public float snapSpeed = 10f;
+    public static float snapSpeed = 0.7f;
     public bool isLightParent = false;
     public GameObject colliderObject;
     public bool isParentHeld = false;
@@ -37,6 +41,10 @@ public class CubeScript : MonoBehaviour
     public AudioClip expand;
     AudioSource audioSource;
     public Collider[] connectedAreas;
+    public GameObject VFXScale;
+    public float expandTime;
+    public float contractTime;
+    bool saveVectors = true;
 
 
 
@@ -45,7 +53,8 @@ public class CubeScript : MonoBehaviour
     {
         //postProcessVolume = Camera.main.gameObject.GetComponent<PostProcessVolume>();
         //postProcessVolume.profile.TryGetSettings(out ca);
-        initialScale = transform.localScale;
+        defaultScale = transform.localScale;
+        endScale = defaultScale;
         rb = gameObject.GetComponent<Rigidbody>();
         if (!childColliders)
             colliderObject = gameObject;
@@ -53,104 +62,19 @@ public class CubeScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        lossyScale = transform.lossyScale.x * inverseScaleFactor;
+        if (VFXScale)
+        {
+            VFXScale.transform.localScale = transform.lossyScale;
+        }
+        lossyScale = transform.lossyScale.x / scaleFactor;
         if (lt != null)
         {
             // lt.range = transform.lossyScale.magnitude * lightModifier;
             lt.intensity = transform.lossyScale.magnitude * lightModifier;
         }
-        scale = transform.localScale;
-        if (!held && snappingEnabled && placeInArea && areaObject != null)
-        {
-            if (!hasPlayedSound)
-            {
-                if (audioSource)
-                {
-                    if (expand)
-                    {
-                        audioSource.clip = expand;
-                        audioSource.Play();
-                        hasPlayedSound = true;
-                    }
-                }
-            }
-            areaObject.GetComponent<BoxScript>().occupied = true;
-            transform.parent = areaObject.transform;
-            rb.isKinematic = true;
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, (Time.deltaTime * snapSpeed) / Vector3.Distance(transform.localScale, Vector3.one));
-            transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(Mathf.Round(transform.localEulerAngles.x / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.y / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.z / snapAngle) * snapAngle), (Time.deltaTime * snapSpeed) / Vector3.Distance(transform.localScale, Vector3.one));
-            transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3((Mathf.Round(transform.parent.transform.localScale.x * 100) / 100) / transform.parent.transform.localScale.x, (Mathf.Round(transform.parent.transform.localScale.y * 100) / 100) / transform.parent.transform.localScale.y, (Mathf.Round(transform.parent.transform.localScale.z * 100) / 100) / transform.parent.transform.localScale.z) * targetScale, (Time.deltaTime * snapSpeed) / Vector3.Distance(transform.localScale, Vector3.one));
-            //Debug.Log(transform.localScale.magnitude);
-            if (Mathf.Round(transform.localScale.magnitude) != 2)
-            {
-                areaObject.GetComponent<BoxScript>().forceOut = true;
-                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0.5f, ref dampVel, 0.05f);
-            }
-            else
-            {
-                areaObject.GetComponent<BoxScript>().forceOut = false;
-                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0f, ref dampVel, 0.5f);
-            }
-            //if (!childColliders)
-            //{
-            //    if (areaObject.transform.parent.name == "SubCube")
-            //    {
-            //	    if (isParentHeld){
-            //		    gameObject.layer = 13;
-            //	    }else{
-            //		    gameObject.layer = 12;
-            //	    }
-            //	    insideSub = true;
-            //    }
-            //    else
-            //    {
-            //    	insideSub = false;
-            //	    gameObject.layer = 0;
-            //	    gameObject.tag = "Surface";
-            //    }
-            //}
-            //else
-            //{
-            //    foreach (Transform t in transform)
-            //    {
-            //	    if (t.gameObject.name == "Collider")
-            //	    {
-            //		    t.tag = "Surface";
-            //		    if (isParentHeld){
-            //			    t.gameObject.layer = 13;
-            //		    }else{
-            //		    	t.gameObject.layer = 12;
-            //		    }
-            //		    insideSub = true;
-            //	    }
-            //    }
-            //    if (areaObject.transform.parent != null){
-            //	    if (areaObject.transform.parent.name == "SubCube")
-            //	    {
-            //		    if (isParentHeld){
-            //			    gameObject.layer = 13;
-            //		    }else{
-            //		    	gameObject.layer = 12;
-            //		    }
-            //		    insideSub = true;
-            //	    }
-            //	    else
-            //	    {
-            //		    gameObject.layer = 0;
-            //		    insideSub = false;
-            //	    }
-            //    }
-            //}
-        }
-        else
-        {
-            rb.isKinematic = false;
-            transform.localScale = Vector3.Lerp(transform.localScale, initialScale, (Time.deltaTime * snapSpeed) * 5);
-            hasPlayedSound = false;
-        }
-
+        //scale = transform.localScale;
         if (areaObject)
         {
             if (childColliders)
@@ -235,24 +159,6 @@ public class CubeScript : MonoBehaviour
         {
             rb.isKinematic = true;
             isParentHeld = false;
-            //if (areaObject && areaObject.name == "SubArea") {
-            //    if (areaObject.transform.parent){
-            //	    foreach (Collider c in areaObject.transform.parent.GetComponent<CubeScript>().colliderObject.GetComponents<Collider>()){
-            //		    foreach (Collider c1 in colliderObject.GetComponents<Collider>()){
-            //			    Physics.IgnoreCollision(c1, c, false);
-            //		    }	   
-            //	    }
-            //	    if (areaObject.transform.parent.parent){
-            //		    if (areaObject.transform.parent.parent.parent){
-            //			    foreach (Collider c in areaObject.transform.parent.parent.parent.GetComponent<CubeScript>().colliderObject.GetComponents<Collider>()){
-            //				    foreach (Collider c1 in colliderObject.GetComponents<Collider>()){
-            //					    Physics.IgnoreCollision(c1, c, false);
-            //				    }	   
-            //			    }
-            //		    }
-            //	    }
-            //    }
-            //}
             if (areaObject)
             {
                 insideSub = false;
@@ -313,7 +219,63 @@ public class CubeScript : MonoBehaviour
         {
 
         }
+        if (!held && snappingEnabled && placeInArea && areaObject != null)
+        {
+            contractTime = 0f;
+            if (!hasPlayedSound)
+            {
+                if (audioSource)
+                {
+                    if (expand)
+                    {
+                        audioSource.clip = expand;
+                        audioSource.Play();
+                        hasPlayedSound = true;
+                    }
+                }
+            }
+            areaObject.GetComponent<BoxScript>().occupied = true;
+            transform.parent = areaObject.transform;
+            if (saveVectors)
+            {
+                initialPosition = transform.localPosition;
+                initialRotation = transform.localRotation;
+                initialScale = transform.localScale;
+                saveVectors = false;
+            }
+            rb.isKinematic = true;
+            expandTime += Time.deltaTime / snapSpeed;
+            transform.localPosition = Vector3.Slerp(initialPosition, Vector3.zero, expandTime);
+            transform.localRotation = Quaternion.Slerp(initialRotation, Quaternion.Euler(Mathf.Round(transform.localEulerAngles.x / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.y / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.z / snapAngle) * snapAngle), expandTime);
+            transform.localScale = Vector3.Slerp(initialScale, (RoundVector(transform.parent.localScale) / transform.parent.localScale.x) * targetScale, expandTime);
+            //Debug.Log(transform.localScale.magnitude);
 
+            if (Mathf.Round(transform.localScale.magnitude) != 2)
+            {
+                areaObject.GetComponent<BoxScript>().forceOut = true;
+                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0.5f, ref dampVel, 0.05f);
+            }
+            else
+            {
+                areaObject.GetComponent<BoxScript>().forceOut = false;
+                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0f, ref dampVel, 0.5f);
+            }
+        }
+        else
+        {
+            //rb.isKinematic = false;
+            if (!saveVectors)
+            {
+                endScale = transform.lossyScale;
+                saveVectors = true;
+            }
+
+            expandTime = 0f;
+            contractTime += Time.deltaTime / snapSpeed;
+            Debug.Log(Vector3.Slerp(endScale, defaultScale, 0));
+            transform.localScale = Vector3.Slerp(endScale, defaultScale, contractTime);
+            hasPlayedSound = false;
+        }
     }
 
     private void OnTriggerEnter(Collider collision)
@@ -334,6 +296,11 @@ public class CubeScript : MonoBehaviour
             //collision.GetComponent<BoxScript>().occupied = true;
             //}
         }
+    }
+
+    private Vector3 RoundVector(Vector3 vect)
+    {
+        return new Vector3(Mathf.Round(vect.x), Mathf.Round(vect.y), Mathf.Round(vect.z));
     }
 
     public List<Collider> getParentColliders()
