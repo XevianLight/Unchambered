@@ -23,6 +23,16 @@ public class PortalRenderer : MonoBehaviour
 		//RenderPipeline.beginCameraRendering(GetComponent<Camera>());
 		RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
 		RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+		if (QualitySettings.GetQualityLevel() == 0)
+        {
+			maxRecursions = 1;
+        } else if (QualitySettings.GetQualityLevel() == 1)
+        {
+			maxRecursions = 2;
+        } else if (QualitySettings.GetQualityLevel() == 2)
+        {
+			maxRecursions = 3;
+        }
 	}
 
 	private void Awake()

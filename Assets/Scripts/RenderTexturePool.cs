@@ -12,6 +12,13 @@ public class RenderTexturePool : MonoBehaviour
     
 	public Vector2 resolutionScale = new Vector2(1,1);
 
+    private void Start()
+    {
+        if(QualitySettings.GetQualityLevel() == 0)
+        {
+            resolutionScale = new Vector2(0.25f, 0.25f);
+        }
+    }
     private void Awake()
     {
         Instance = this;

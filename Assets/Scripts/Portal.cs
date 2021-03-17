@@ -320,6 +320,7 @@ public class Portal : MonoBehaviour
         Vector3 direction,
         Quaternion rotation,
         float maxRange,
+        float rangeIfNotHit,
         LayerMask layerMask,
         int maxRecursions,
         out Vector3 endpoint,
@@ -333,6 +334,7 @@ public class Portal : MonoBehaviour
             direction,
             rotation,
             maxRange,
+            rangeIfNotHit,
             layerMask,
             maxRecursions,
             out endpoint,
@@ -349,6 +351,7 @@ public class Portal : MonoBehaviour
         Vector3 direction,
         Quaternion rotation,
         float maxRange,
+        float rangeIfNotHit,
         LayerMask layerMask,
         int maxRecursions,
         out Vector3 endpoint,
@@ -402,7 +405,7 @@ public class Portal : MonoBehaviour
                 direction,
                 out var hit2,
                 rotation,
-                maxRange,
+                rangeIfNotHit,
                 ~tempLayerMask); // Clamp to max array length
             hitInfo = new RaycastHit(); // Dummy
 
@@ -498,6 +501,7 @@ public class Portal : MonoBehaviour
                 TransformDirectionBetweenPortals(portal, portal.targetPortal, direction),
                 rotation,
                 (maxRange - hit.distance),
+                rangeIfNotHit,
                 layerMask,
                 maxRecursions,
                 out endpoint,

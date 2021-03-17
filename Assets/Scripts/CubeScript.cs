@@ -15,7 +15,7 @@ public class CubeScript : MonoBehaviour
     public Vector3 initialScale;
     public Vector3 endScale;
     public float scaleFactor = 1;
-    public float lossyScale;
+    public float scale;
     public float snapAngle = 90f;
     public bool held = false;
     public bool snappingEnabled = false;
@@ -32,7 +32,7 @@ public class CubeScript : MonoBehaviour
     public int initialColliderCount = 1;
     public int colliderCount = 1;
     public bool childColliders = false;
-    public static float snapSpeed = 0.7f;
+    public float snapSpeed = 0.7f;
     public bool isLightParent = false;
     public GameObject colliderObject;
     public bool isParentHeld = false;
@@ -45,6 +45,12 @@ public class CubeScript : MonoBehaviour
     public float expandTime;
     public float contractTime;
     bool saveVectors = true;
+    public AnimationCurve expandCurve;
+    public int pickUpLayer = 8;
+    public int insideSubLayer = 12;
+    public int insideSubCubeLayer = 1;
+    public bool scaling = false;
+    public AnimationCurve test;
 
 
 
@@ -68,7 +74,7 @@ public class CubeScript : MonoBehaviour
         {
             VFXScale.transform.localScale = transform.lossyScale;
         }
-        lossyScale = transform.lossyScale.x / scaleFactor;
+        scale = transform.lossyScale.magnitude / defaultScale.magnitude;
         if (lt != null)
         {
             // lt.range = transform.lossyScale.magnitude * lightModifier;
@@ -84,67 +90,23 @@ public class CubeScript : MonoBehaviour
                     if (t.gameObject.name == "Collider" && t.gameObject.name != "Portal")
                     {
                         t.tag = "Surface";
-                        if (isParentHeld)
-                        {
-                            t.gameObject.layer = 13;
-                        }
-                        else
-                        {
-                            t.gameObject.layer = 12;
-                        }
+                        t.gameObject.layer = isParentHeld ? 13 : 12;
                         insideSub = true;
                     }
                 }
-                if (ignoreFlares)
-                {
-                    gameObject.layer = 14;
-                }
-                else
-                {
-                    gameObject.layer = 8;
-                }
+
+                gameObject.layer = 8;
                 gameObject.tag = "Surface";
             }
             else
             {
                 tag = "Surface";
-                if (isParentHeld)
-                {
-                    gameObject.layer = 13;
-                }
-                else
-                {
-                    gameObject.layer = 12;
-                }
+                gameObject.layer = isParentHeld ? 13 : 12;
             }
-            //if (areaObject.transform.parent){	//If the areaObject is part of a larger object, disable collision between this object and the larger object.
-            //    isParentHeld = areaObject.transform.parent.GetComponent<CubeScript>().held;
-            //    foreach (Collider c in areaObject.transform.parent.GetComponent<CubeScript>().colliderObject.GetComponents<Collider>()){
-            //	    foreach (Collider c1 in colliderObject.GetComponents<Collider>()){
-            //		    Physics.IgnoreCollision(c1, c, true);
-            //	    }	   
-            //    }
-            //    if (areaObject.transform.parent.parent){
-            //	    if (areaObject.transform.parent.parent.parent){
-            //	    	foreach (Collider c in areaObject.transform.parent.parent.parent.GetComponent<CubeScript>().colliderObject.GetComponents<Collider>()){
-            //			    foreach (Collider c1 in colliderObject.GetComponents<Collider>()){
-            //				    Physics.IgnoreCollision(c1, c, true);
-            //		    	}	 
-            //	    	}  
-            //    	}
-            //	}
-            //}
             if (areaObject.transform.parent)
             {
-                if (areaObject.transform.parent.GetComponent<CubeScript>().held && !held)
-                {
-                    isParentHeld = true;
-                }
-                else
-                {
-                    isParentHeld = areaObject.transform.parent.GetComponent<CubeScript>().isParentHeld;
-                }
-                //isParentHeld = areaObject.transform.parent.GetComponent<CubeScript>().isParentHeld;
+                CubeScript cs = areaObject.transform.parent.GetComponent<CubeScript>();
+                isParentHeld = cs.held && !held ? true : cs.isParentHeld;
                 foreach (Collider c in getParentColliders())
                 {
                     foreach (Collider c1 in colliderObject.GetComponents<Collider>())
@@ -164,14 +126,7 @@ public class CubeScript : MonoBehaviour
                 insideSub = false;
                 if (!childColliders)
                 {
-                    if (ignoreFlares)
-                    {
-                        gameObject.layer = 14;
-                    }
-                    else
-                    {
-                        gameObject.layer = 8;
-                    }
+                    gameObject.layer = 8;
                     gameObject.tag = "Untagged";
                 }
                 else
@@ -181,14 +136,7 @@ public class CubeScript : MonoBehaviour
                         if (t.gameObject.name == "Collider" && t.gameObject.name != "Portal")
                         {
                             t.tag = "Untagged";
-                            if (ignoreFlares)
-                            {
-                                t.gameObject.layer = 14;
-                            }
-                            else
-                            {
-                                t.gameObject.layer = 8;
-                            }
+                            t.gameObject.layer = 8;
                         }
                     }
                     gameObject.layer = 8;
@@ -245,21 +193,16 @@ public class CubeScript : MonoBehaviour
             }
             rb.isKinematic = true;
             expandTime += Time.deltaTime / snapSpeed;
-            transform.localPosition = Vector3.Slerp(initialPosition, Vector3.zero, expandTime);
-            transform.localRotation = Quaternion.Slerp(initialRotation, Quaternion.Euler(Mathf.Round(transform.localEulerAngles.x / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.y / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.z / snapAngle) * snapAngle), expandTime);
-            transform.localScale = Vector3.Slerp(initialScale, (RoundVector(transform.parent.localScale) / transform.parent.localScale.x) * targetScale, expandTime);
-            //Debug.Log(transform.localScale.magnitude);
+            float curveTime = expandCurve.Evaluate(expandTime);
+            transform.localPosition = Vector3.Slerp(initialPosition, Vector3.zero, curveTime);
+            transform.localRotation = Quaternion.Slerp(initialRotation, Quaternion.Euler(Mathf.Round(transform.localEulerAngles.x / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.y / snapAngle) * snapAngle, Mathf.Round(transform.localEulerAngles.z / snapAngle) * snapAngle), curveTime);
+            transform.localScale = Vector3.Slerp(initialScale, Vector3.one * targetScale, curveTime);
 
-            if (Mathf.Round(transform.localScale.magnitude) != 2)
-            {
-                areaObject.GetComponent<BoxScript>().forceOut = true;
-                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0.5f, ref dampVel, 0.05f);
-            }
-            else
-            {
-                areaObject.GetComponent<BoxScript>().forceOut = false;
-                //ca.intensity.value = Mathf.SmoothDamp(ca.intensity, 0f, ref dampVel, 0.5f);
-            }
+            //Debug.Log(transform.localScale.magnitude);
+            BoxScript bs = areaObject.GetComponent<BoxScript>();
+            bs.forceOut = Mathf.Round(transform.localScale.magnitude) == 2 ? false : true;
+            scaling = (expandTime <= 1) ? true : false;
+            test.AddKey(Mathf.Clamp(expandTime, 0, 1), scaling ? 1 : 0);
         }
         else
         {
@@ -272,9 +215,11 @@ public class CubeScript : MonoBehaviour
 
             expandTime = 0f;
             contractTime += Time.deltaTime / snapSpeed;
-            Debug.Log(Vector3.Slerp(endScale, defaultScale, 0));
+            //Debug.Log(Vector3.Slerp(endScale, defaultScale, 0));
             transform.localScale = Vector3.Slerp(endScale, defaultScale, contractTime);
             hasPlayedSound = false;
+            scaling = (contractTime <= 1) ? true : false;
+            test.AddKey(Mathf.Clamp(contractTime, 0, 1), scaling ? 1 : 0);
         }
     }
 
@@ -331,14 +276,12 @@ public class CubeScript : MonoBehaviour
         }
     }
 
-    //private void OnTriggerStay(Collider collision)
-    //{
-    //	if (collision.tag == "PlaceableArea"){
-    //		if (!held && areaObject == collision.gameObject){
-    //			collision.GetComponent<BoxScript>().occupied = true;
-    //		}else{
-    //			collision.GetComponent<BoxScript>().occupied = false;
-    //		}
-    //	}
-    //}
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.GetComponent<Rigidbody>())
+        {
+            if (!areaObject || held)
+                other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+        }
+    }
 }
