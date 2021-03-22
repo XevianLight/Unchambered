@@ -333,26 +333,26 @@ public class MouseLook : MonoBehaviour
         {
             // Disable cameras response to input
 
-            if (heldObject)
-            {
+            //if (heldObject)
+            //{
                 stopRotation = true;
                 // Save targeted objects angular velocity for later
 
                 heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
                 RotateObject(rotateChild ? heldObject : heldChild, rotateRelativeCamera);
 
-            }
+            //}
         }
 
         if (Input.GetMouseButton(1))
         {
 
             // If an object is held, rotate it from mouse input
-            if (heldObject != null)
-            {
+            //if (heldObject != null)
+            //{
                 stopRotation = true;
                 RotateObject(rotateChild ? heldChild : heldObject, rotateRelativeCamera);
-            }
+            //}
         }
         else
         {
