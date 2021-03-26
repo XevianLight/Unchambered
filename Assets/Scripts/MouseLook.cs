@@ -139,7 +139,8 @@ public class MouseLook : MonoBehaviour
             if (objectHit != null && canBePickedUp)
             {
                 heldObject = objectHit;
-
+                cs = heldObject.GetComponent<CubeScript>();
+                rb = heldObject.GetComponent<Rigidbody>();
                 // Does the object have a child that should be rotated instead of itself?
                 if (cs.isLightParent)
                 {

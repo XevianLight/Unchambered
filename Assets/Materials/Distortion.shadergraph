@@ -976,6 +976,8 @@
         "m_GuidSerialized": "a9ad1cde-1767-497e-afd5-f587fa8c6b4f"
     },
     "m_Name": "Speed2Y",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_02aab025001346ccad53bb81d55eb253",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1196,6 +1198,8 @@
         "m_GuidSerialized": "b6053409-a4cf-4181-8464-b736ab296dcb"
     },
     "m_Name": "Intensity",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_0930890f2c2e43e788e587d4d0f7517d",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1347,6 +1351,8 @@
         "m_GuidSerialized": "d6982b87-7572-437c-b0c2-7f6208398b98"
     },
     "m_Name": "Size2",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_16d1779235eb4240a9d78ec511b16298",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1436,6 +1442,8 @@
         "m_GuidSerialized": "41ceb984-4c9d-44e6-af3d-7b61b67d12a9"
     },
     "m_Name": "Speed1Y",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_1a56dd6c6d4842eaaa642dca0618b0a5",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1697,6 +1705,8 @@
         "m_GuidSerialized": "d9d74e66-effb-4a96-9c84-4c44a8103d03"
     },
     "m_Name": "Tile2",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector2_208e7d92339d4fc09c31cb9c01276f0b",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -1847,7 +1857,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Texture2DMaterialSlot",
     "m_ObjectId": "2d82e33892394ee997afa1536e86cfb1",
     "m_Id": 0,
-    "m_DisplayName": "Normal2",
+    "m_DisplayName": "Mask",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -2419,6 +2429,8 @@
         "m_GuidSerialized": "833f3e0f-447d-41f7-9a29-0941d1f6cff4"
     },
     "m_Name": "Speed1X",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_4a2b65c69b264d9dbbdaf2635668a995",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -3655,6 +3667,8 @@
         "m_GuidSerialized": "c26ab865-43df-4b32-b3fa-d6c045358552"
     },
     "m_Name": "Opacity",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_7621ba99b6ce4a8a8577bca7b0b98f1a",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -4416,6 +4430,8 @@
         "m_GuidSerialized": "dd571a1b-55aa-47fa-a33a-b30b25fa18d1"
     },
     "m_Name": "Speed2X",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_97717de8fd3e433593d9241a141bbd1e",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -4617,6 +4633,8 @@
         "m_GuidSerialized": "0f77f05d-97b1-41dd-8bfb-bd478e1c1113"
     },
     "m_Name": "Rotation",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_9d89b2caa75544468546d7b8eeebf053",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -4854,6 +4872,8 @@
         "m_GuidSerialized": "adb2b564-bbf4-490a-bc7d-743046f7e049"
     },
     "m_Name": "Size1",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector1_a9873649923a4661991efd35babd6367",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -5068,6 +5088,8 @@
         "m_GuidSerialized": "7ccdeb99-a09e-4b8e-8e74-e8f5a67098a3"
     },
     "m_Name": "Secondary Layer",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Boolean_b3f3617fe6924b4f94b69ffe9666dd3c",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -5144,6 +5166,8 @@
         "m_GuidSerialized": "2d86e856-6321-47c8-bdca-385f7cba8ba7"
     },
     "m_Name": "Overlay",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Boolean_b4cce1cbec694b35bafa47f71fe99961",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -5192,6 +5216,8 @@
         "m_GuidSerialized": "7aa6753f-9cce-4702-a0f4-28f08baa86d1"
     },
     "m_Name": "Tile1",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Vector2_b9dfcaa4dc954e6aa92bfeadccaf2dc8",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -5883,6 +5909,8 @@
         "m_GuidSerialized": "82408b75-3029-41ac-bfcc-239309e9ccef"
     },
     "m_Name": "Mask",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_db2a957667dc4fb59a7b6afc89068351",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -6284,6 +6312,8 @@
         "m_GuidSerialized": "fcc5ceb2-5923-4a49-b2e3-8a536926be59"
     },
     "m_Name": "Normal",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_f4c2035e728c4f84a4a9754ee02624e7",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
@@ -6307,6 +6337,8 @@
         "m_GuidSerialized": "51336d36-f5f1-4e0e-b5d3-8e2b74a09116"
     },
     "m_Name": "Overlay Texture",
+    "m_DefaultRefNameVersion": 0,
+    "m_RefNameGeneratedByDisplayName": "",
     "m_DefaultReferenceName": "Texture2D_f53cec75c11148cf9bef8669af18e545",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,

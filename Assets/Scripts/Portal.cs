@@ -8,6 +8,15 @@ using UnityEditor;
 using RenderPipeline = UnityEngine.Rendering.RenderPipelineManager;
 
 
+public static class ExtensionMethods
+{
+
+    public static float Remap(this float value, float from1, float to1, float from2, float to2)
+    {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+    }
+
+}
 public class Portal : MonoBehaviour
 {
     public Portal targetPortal;
@@ -41,6 +50,8 @@ public class Portal : MonoBehaviour
     public int maxRecursionsOverride = -1;
     public bool allowRecursiveRaycasts = true;
     bool run = false;
+
+    public AnimationCurve distanceRes;
 
     public Plane plane;
 
@@ -680,8 +691,9 @@ public class Portal : MonoBehaviour
         // Get new temporary render texture and set to portal's material
         // Will be released by CALLER, not by this function. This is so that the caller can use the render texture
         // for their own purposes, such as a Render() or a main camera render, before releasing it.
-
-        temporaryPoolItem = RenderTexturePool.Instance.GetTexture();
+        float distance = distanceRes.Evaluate(Vector3.Distance(mainCamera.transform.position, transform.position)/* * new Vector2(mainCamera.WorldToScreenPoint(transform.position).x.Remap(0,Screen.width, -1, 1), mainCamera.WorldToScreenPoint(transform.position).y.Remap(0, Screen.height, -1, 1)).magnitude*/);
+        //Debug.Log(new Vector2(mainCamera.WorldToScreenPoint(transform.position).x.Remap(0, Screen.width, -1, 1), mainCamera.WorldToScreenPoint(transform.position).y.Remap(0, Screen.height, -1, 1)).magnitude);
+        temporaryPoolItem = RenderTexturePool.Instance.GetTexture(new Vector2(distance, distance));
 
         // Use portal camera
 
