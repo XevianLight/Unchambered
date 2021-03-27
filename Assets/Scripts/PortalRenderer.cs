@@ -8,91 +8,103 @@ using UnityEngine.SceneManagement;
 
 public class PortalRenderer : MonoBehaviour
 {
-	public Camera portalCamera;
-	public int maxRecursions = 2;
+    public Camera portalCamera;
+    public int maxRecursions = 2;
 
-	public int debugTotalRenderCount;
+    public int debugTotalRenderCount;
 
-	private Camera mainCamera;
-	private PortalOcclusionVolume[] occlusionVolumes;
-	
-	private void Start()
-	{
-		mainCamera = Camera.main;
-		occlusionVolumes = FindObjectsOfType<PortalOcclusionVolume>();
-		//RenderPipeline.beginCameraRendering(GetComponent<Camera>());
-		RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
-		RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
-		if (QualitySettings.GetQualityLevel() == 0)
+    private Camera mainCamera;
+    private PortalOcclusionVolume[] occlusionVolumes;
+
+    private void Start()
+    {
+        mainCamera = Camera.main;
+        occlusionVolumes = FindObjectsOfType<PortalOcclusionVolume>();
+        //RenderPipeline.beginCameraRendering(GetComponent<Camera>());
+        RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+        if (QualitySettings.GetQualityLevel() == 0)
         {
-			maxRecursions = 1;
-        } else if (QualitySettings.GetQualityLevel() == 1)
-        {
-			maxRecursions = 2;
-        } else if (QualitySettings.GetQualityLevel() == 2)
-        {
-			maxRecursions = 3;
+            maxRecursions = 1;
         }
-	}
+        else if (QualitySettings.GetQualityLevel() == 1)
+        {
+            maxRecursions = 2;
+        }
+        else if (QualitySettings.GetQualityLevel() == 2)
+        {
+            maxRecursions = 3;
+        }
+    }
 
-	private void Awake()
-	{
-		DontDestroyOnLoad(this.gameObject);
-	}
-	private void OnEnable()
-	{
-		//RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
-		//RenderPipelineManager.beginCameraRendering -= EndCameraRendering;
-	}
-	private void OnDisable()
-	{
-		//RenderPipelineManager.beginCameraRendering += EndCameraRendering;
-		//RenderPipelineManager.beginCameraRendering -= BeginCameraRendering;
-	}
+    private void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+    private void OnEnable()
+    {
+        //RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
+        //RenderPipelineManager.beginCameraRendering -= EndCameraRendering;
+    }
+    private void OnDisable()
+    {
+        //RenderPipelineManager.beginCameraRendering += EndCameraRendering;
+        //RenderPipelineManager.beginCameraRendering -= BeginCameraRendering;
+    }
 
-	private void OnBeginCameraRendering(ScriptableRenderContext SRC, Camera camera)
-	{
-				if (Application.isPlaying){
-		debugTotalRenderCount = 0;
+    private void OnBeginCameraRendering(ScriptableRenderContext SRC, Camera camera)
+    {
+        if (Application.isPlaying)
+        {
 
-		PortalOcclusionVolume currentOcclusionVolume = null;
+            debugTotalRenderCount = 0;
 
-		foreach (var occlusionVolume in occlusionVolumes)
-		{
-			if (occlusionVolume.collider.bounds.Contains(mainCamera.transform.position))
-			{
-				currentOcclusionVolume = occlusionVolume;
-				break;
-			}
-		}
+            PortalOcclusionVolume currentOcclusionVolume = null;
 
-		if (currentOcclusionVolume != null)
-		{
-			var cameraPlanes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
+            foreach (var occlusionVolume in occlusionVolumes)
+            {
+                if (occlusionVolume.collider.bounds.Contains(mainCamera.transform.position))
+                {
+                    currentOcclusionVolume = occlusionVolume;
+                    break;
+                }
+            }
 
-			foreach (var portal in currentOcclusionVolume.portals)
-			{
-				if (!portal.ShouldRender(cameraPlanes)) continue;
+            if (currentOcclusionVolume != null)
+            {
+                var cameraPlanes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
 
-				portal.RenderViewthroughRecursive(
-					mainCamera.transform.position,
-					mainCamera.transform.rotation,
-					out _,
-					out _,
-					out var renderCount,
-					portalCamera,
-					0,
-					maxRecursions,
-					SRC);
+                foreach (var portal in currentOcclusionVolume.portals)
+                {
+                    if (!portal.ShouldRender(cameraPlanes)) continue;
 
-				debugTotalRenderCount += renderCount;
-			}
-		}
-		}
-	}
+                    portal.RenderViewthroughRecursive(
+                        mainCamera.transform.position,
+                        mainCamera.transform.rotation,
+                        out _,
+                        out _,
+                        out var renderCount,
+                        portalCamera,
+                        0,
+                        maxRecursions,
+                        SRC);
 
-	private void OnEndCameraRendering(ScriptableRenderContext SRC, Camera camera)
-	{
-		RenderTexturePool.Instance.ReleaseAllTextures();
-	}
+                    debugTotalRenderCount += renderCount;
+
+                }
+            }
+        }
+    }
+
+    private void OnEndCameraRendering(ScriptableRenderContext SRC, Camera camera)
+    {
+        if (Application.isPlaying)
+        {
+            RenderTexturePool.Instance.ReleaseAllTextures();
+            if (camera = mainCamera)
+            {
+                RenderTexturePool.Instance.GetTexture(RenderTexturePool.Instance.resolutionScale);
+            }
+        }
+    }
 }
