@@ -82,6 +82,9 @@ public class MouseLook : MonoBehaviour
     CubeScript cs;
     Rigidbody rb;
     Rigidbody crb;
+    Portal hitPortal;
+    bool rotatePortal = true;
+    public bool inPortal = false;
 
     // Start is called before the first frame update
     void Start()
@@ -139,7 +142,8 @@ public class MouseLook : MonoBehaviour
             if (objectHit != null && canBePickedUp)
             {
                 heldObject = objectHit;
-
+                cs = heldObject.GetComponent<CubeScript>();
+                rb = heldObject.GetComponent<Rigidbody>();
                 // Does the object have a child that should be rotated instead of itself?
                 if (cs.isLightParent)
                 {
@@ -190,16 +194,39 @@ public class MouseLook : MonoBehaviour
                     cs.held = true;
                 }
 
+                if (Physics.Raycast(transform.position + (cam.transform.forward * 0.01f), cam.transform.forward, out hit, range, (1 << 16)))
+                {
+                    if (rotatePortal)
+                    {
+                        hitPortal = hit.transform.GetComponent<Portal>();
+                        if (!inPortal)
+                            heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(hitPortal, hitPortal.targetPortal, heldObject.transform.rotation);
+                        rotatePortal = false;
+                    }
+                }
+                else
+                {
+                    if (!rotatePortal)
+                    {
+                        if (hitPortal)
+                        {
+                            if (!inPortal)
+                                heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(hitPortal.targetPortal, hitPortal, heldObject.transform.rotation);
+                            rotatePortal = true;
+                        }
+                    }
+                }
+
                 // Debug ideal object location
                 ExtDebug.DrawBoxCastOnHit(
-                    cameraPosition,
-                    heldObject.transform.lossyScale / 2,
-                    heldObject.transform.rotation,
-                    //cs.scaling ? (heldPosition - cameraPosition).normalized : cameraDirection,
-                    Vector3.Slerp((heldPosition - cameraPosition).normalized, cameraDirection, cs.contractTime),
-                    range,
-                    new Color(0, 0, 255)
-                    );
+                cameraPosition,
+                heldObject.transform.lossyScale / 2,
+                heldObject.transform.rotation,
+                //cs.scaling ? (heldPosition - cameraPosition).normalized : cameraDirection,
+                Vector3.Slerp((heldPosition - cameraPosition).normalized, cameraDirection, cs.contractTime),
+                range,
+                new Color(0, 0, 255)
+                );
 
                 //if (Physics.BoxCast(Camera.main.transform.position, heldObject.transform.lossyScale / 2, Camera.main.transform.forward, out hit, heldObject.transform.rotation, range, ~(pickupLayer | (1 << 2) | (1 << 10) | (1 << 11) | (1 << 13) | (1 << 14))))
                 //if (Portal.RaycastRecursive(Camera.main.transform.position, Camera.main.transform.forward, range, ~(pickupLayer | (1 << 2) | (1 << 10) | (1 << 11) | (1 << 13) | (1 << 14)), 8, out endpoint, out hit, out rotationVector))
@@ -225,7 +252,7 @@ public class MouseLook : MonoBehaviour
                     //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
                     //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
                     bool allowSnap = true;
-                    Debug.DrawLine(cameraPosition, hit.point, new Color(255,255,0));
+                    Debug.DrawLine(cameraPosition, hit.point, new Color(255, 255, 0));
                     if (cs.connectedAreas.Length > 0)
                     {
                         foreach (Collider c in cs.connectedAreas)
@@ -234,17 +261,7 @@ public class MouseLook : MonoBehaviour
                         }
                     }
 
-                    // If the object is too far away, set position instead of lerp
-                    if (Vector3.Distance(heldPosition, endpoint) <= 2 * range * cs.scale && allowSnap)
-                    {
-                        heldObject.transform.position = Vector3.Slerp(
-                            heldPosition,
-                            finalPosition + (rotationVector.transform.forward * hit.distance),
-                            (Time.deltaTime * snapSpeed) / cs.scale);
-                        //heldObject.transform.position = finalPosition + (rotationVector.transform.forward * hit.distance);
-                    }
-
-                    else
+                    if (Vector3.Distance(heldPosition, endpoint) >= 2 * range * cs.scale)
                     {
                         if (allowSnap)
                         {
@@ -254,6 +271,18 @@ public class MouseLook : MonoBehaviour
                         else
                         {
                             Debug.Log("Object snapping was denied");
+                        }
+                    }
+                    // If the object is too far away, set position instead of lerp
+                    else
+                    {
+                        if (allowSnap)
+                        {
+                            heldObject.transform.position = Vector3.Slerp(
+                                heldPosition,
+                                finalPosition + (rotationVector.transform.forward * hit.distance),
+                                (Time.deltaTime * snapSpeed) / cs.scale);
+                            //heldObject.transform.position = finalPosition + (rotationVector.transform.forward * hit.distance);
                         }
                     }
                 }
@@ -272,15 +301,7 @@ public class MouseLook : MonoBehaviour
                     //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
                     //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
                     // If the object is too far away, set position instead of lerp
-                    if (Vector3.Distance(heldPosition, endpoint) <= 2 * range * cs.scale && allowSnap)
-                    {
-                        heldObject.transform.position = Vector3.Slerp(
-                            heldPosition,
-                            endpoint,
-                            (Time.deltaTime * snapSpeed) / cs.scale);
-                        //heldObject.transform.position = endpoint;
-                    }
-                    else
+                    if (Vector3.Distance(heldPosition, endpoint) >= 2 * range * cs.scale)
                     {
                         if (allowSnap)
                         {
@@ -291,6 +312,17 @@ public class MouseLook : MonoBehaviour
                         {
                             Debug.Log("Object snapping was denied");
                         }
+                    }
+                    else
+                    {
+                        if (allowSnap)
+                        {
+                            heldObject.transform.position = Vector3.Slerp(
+                                heldPosition,
+                                endpoint,
+                                (Time.deltaTime * snapSpeed) / cs.scale);
+                        }
+                        //heldObject.transform.position = endpoint;
                     }
                     //heldObject.transform.position = Vector3.Lerp(heldObject.transform.position, Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, (rangeIfNotHit))), snapSpeed * Time.deltaTime / heldObject.transform.lossyScale.magnitude);
 
@@ -335,11 +367,11 @@ public class MouseLook : MonoBehaviour
 
             //if (heldObject)
             //{
-                stopRotation = true;
-                // Save targeted objects angular velocity for later
+            stopRotation = true;
+            // Save targeted objects angular velocity for later
 
-                heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
-                RotateObject(rotateChild ? heldObject : heldChild, rotateRelativeCamera);
+            heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
+            RotateObject(rotateChild ? heldObject : heldChild, rotateRelativeCamera);
 
             //}
         }
@@ -350,8 +382,8 @@ public class MouseLook : MonoBehaviour
             // If an object is held, rotate it from mouse input
             //if (heldObject != null)
             //{
-                stopRotation = true;
-                RotateObject(rotateChild ? heldChild : heldObject, rotateRelativeCamera);
+            stopRotation = true;
+            RotateObject(rotateChild ? heldChild : heldObject, rotateRelativeCamera);
             //}
         }
         else
