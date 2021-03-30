@@ -7,7 +7,7 @@ Shader "Custom/Portal Viewthrough"{
 
         SubShader{
         //the material is completely non-transparent and is rendered at the same time as the other opaque geometry
-        Tags{ "RenderType" = "Opaque" "Queue" = "Geometry"}
+        Tags{ "RenderType" = "Opaque" "Queue" = "Background"}
 		//Cull off
         ZWrite On
         ZTest LEqual
