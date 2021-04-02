@@ -241,7 +241,7 @@ public class MouseLook : MonoBehaviour
                     range,
                     range,
                     ~pickupLayer,
-                    8,
+                    16,
                     out endpoint,
                     out hit,
                     out rotationVector,

@@ -163,7 +163,7 @@ public class Portal : MonoBehaviour
                 ml = portalableObject.GetComponent<MouseLook>();
                 portalableObject.OnHasTeleported(this, targetPortal, newPosition, newRotation);
                 portalableObject.transform.position = newPosition;
-                portalableObject.transform.eulerAngles = new Vector3 (newRotation.eulerAngles.x, portalableObject.transform.eulerAngles.y, newRotation.eulerAngles.z);
+                portalableObject.transform.eulerAngles = new Vector3(newRotation.eulerAngles.x, portalableObject.transform.eulerAngles.y, newRotation.eulerAngles.z);
                 ml.tempRotation = newRotation;
                 ml.rotation.y = newRotation.eulerAngles.y;
                 //portalableObject.transform.eulerAngles = new Vector3(newRotation.eulerAngles.x, ml.rotation.y, newRotation.eulerAngles.z);
@@ -199,18 +199,18 @@ public class Portal : MonoBehaviour
         out Vector3 finalPosition
         )
     {
-            return RaycastRecursiveInternal(
-                position,
-                direction,
-                maxRange,
-                layerMask,
-                maxRecursions,
-                out endpoint,
-                out hitInfo,
-                out finalDirectionObj,
-                out finalPosition,
-                0,
-                null);
+        return RaycastRecursiveInternal(
+            position,
+            direction,
+            maxRange,
+            layerMask,
+            maxRecursions,
+            out endpoint,
+            out hitInfo,
+            out finalDirectionObj,
+            out finalPosition,
+            0,
+            null);
     }
 
     private static bool RaycastRecursiveInternal(
@@ -361,7 +361,7 @@ public class Portal : MonoBehaviour
         int currentRecursion,
         GameObject ignoreObject)
     {
-        
+
         // Ignore a specific object when raycasting.
         // Useful for preventing a raycast through a portal from hitting the target portal from the back,
         // which makes a raycast unable to go through a portal since it'll just be absorbed by the target portal's trigger.
@@ -388,11 +388,9 @@ public class Portal : MonoBehaviour
             out var hit,
             maxRange,
             layerMask); // Clamp to max array 
+        Debug.Log(raycastHitSomething);
+        //Debug.DrawLine(position, position + (direction * maxRange), new Color(255, 255, 0));
 
-        // Reset ignore
-
-        if (ignoreObject)
-            ignoreObject.layer = ignoreObjectOriginalLayer;
 
         // If no objects are hit, the recursion ends here, with no effect
 
@@ -403,166 +401,82 @@ public class Portal : MonoBehaviour
                 position,
                 scale,
                 direction,
-                out var hit2,
-                rotation,
-                rangeIfNotHit,
-                ~tempLayerMask); // Clamp to max array length
-            //hitInfo = new RaycastHit(); // Dummy
-
-            ExtDebug.DrawBoxCastOnHit(
-                position,
-                scale,
-                rotation,
-                direction,
-                maxRange,
-                new Color(255, 255, 0));
-            if (!boxCastHitSomething)
-            {
-                //Debug.Log("BoxNotHit");
-
-                hitInfo = new RaycastHit(); // Dummy
-                endpoint = position + direction * (maxRange);
-                Debug.DrawLine(position, endpoint);
-                orientRay.transform.position = position;
-                orientRay.transform.LookAt(endpoint);
-                finalDirectionObj = orientRay;
-                finalPosition = position;
-                return false;
-            }
-            else
-            {
-                //Debug.Log("BoxHit");
-                endpoint = position + direction * (maxRange);
-                hitInfo = hit2;
-                Debug.DrawLine(position, endpoint, new Color(0, 0, 255));
-                Debug.DrawLine(position, hit2.point, new Color(255, 0, 0));
-                orientRay.transform.position = position;
-                orientRay.transform.LookAt(endpoint);
-                finalDirectionObj = orientRay;
-                finalPosition = position;
-                return true;
-            }
-        }
-        else
-        {
-            LayerMask tempLayerMask = ~layerMask | (1 << 16);
-            var boxCastHitSomething2 = Physics.BoxCast(
-                position,
-                scale,
-                direction,
-                out var hit3,
+                out var boxHit,
                 rotation,
                 maxRange,
-                ~tempLayerMask); // Clamp to max array length
-            //hitInfo = new RaycastHit(); // Dummy
-
-            ExtDebug.DrawBoxCastOnHit(
-                position,
-                scale,
-                rotation,
-                direction,
-                maxRange,
-                new Color(255, 0, 255));
-            var portalTemp = hit.collider.GetComponent<Portal>();
-            if (boxCastHitSomething2 && !portalTemp)
+                ~tempLayerMask);
+            if (boxCastHitSomething)
             {
-                //Debug.Log("BoxHit");
-                endpoint = position + direction * (maxRange);
-                hitInfo = hit3;
-                Debug.DrawLine(position, endpoint, new Color(0, 0, 255));
-                Debug.DrawLine(position, hit3.point, new Color(255, 0, 0));
-                orientRay.transform.position = position;
-                orientRay.transform.LookAt(endpoint);
-                finalDirectionObj = orientRay;
+                hitInfo = boxHit;
+                endpoint = boxHit.point;
                 finalPosition = position;
+                finalDirectionObj = orientRay;
                 return true;
             }
         }
 
         // If the object hit is a portal, recurse, unless we are already at max recursions
-        var portal = hit.collider.GetComponent<Portal>();
-        if (portal && portal.allowRecursiveRaycasts)
+        if (hit.collider)
         {
-            if (currentRecursion >= maxRecursions)
+            var portal = hit.collider.GetComponent<Portal>();
+            if (portal && portal.allowRecursiveRaycasts)
             {
-                hitInfo = new RaycastHit(); // Dummy
-                endpoint = position + (direction * (maxRange));
-                orientRay.transform.position = position;
-                orientRay.transform.LookAt(endpoint);
-                finalDirectionObj = orientRay;
-                finalPosition = position;
-                return false;
+                if (currentRecursion >= maxRecursions)
+                {
+                    hitInfo = new RaycastHit(); // Dummy
+                    endpoint = position + (direction * (maxRange));
+                    orientRay.transform.position = position;
+                    orientRay.transform.LookAt(endpoint);
+                    finalDirectionObj = orientRay;
+                    finalPosition = position;
+                    return false;
+                }
+
+                // Continue going down the rabbit hole...
+
+                return BoxcastRecursiveInternal(
+                    TransformPositionBetweenPortals(portal, portal.targetPortal, hit.point),
+                    scale,
+                    TransformDirectionBetweenPortals(portal, portal.targetPortal, direction),
+                    rotation,
+                    (maxRange - hit.distance),
+                    rangeIfNotHit,
+                    layerMask,
+                    maxRecursions,
+                    out endpoint,
+                    out hitInfo,
+                    out finalDirectionObj,
+                    out finalPosition,
+                    currentRecursion + 1,
+                    portal.targetPortal.gameObject);
             }
-
-            // Continue going down the rabbit hole...
-
-            return BoxcastRecursiveInternal(
-                TransformPositionBetweenPortals(portal, portal.targetPortal, hit.point),
-                scale,
-                TransformDirectionBetweenPortals(portal, portal.targetPortal, direction),
-                rotation,
-                (maxRange - hit.distance),
-                rangeIfNotHit,
-                layerMask,
-                maxRecursions,
-                out endpoint,
-                out hitInfo,
-                out finalDirectionObj,
-                out finalPosition,
-                currentRecursion + 1,
-                portal.targetPortal.gameObject);
         }
-
         // If the object hit is not a portal, then congrats! We stop here and report back that we hit something.
 
         LayerMask tempLayerMask1 = ~layerMask | (1 << 16);
-
-        var boxCastHitSomething3 = Physics.BoxCast(
+        var boxCastHitSomething1 = Physics.BoxCast(
             position,
             scale,
             direction,
-            out var hit4,
+            out var boxHit1,
             rotation,
             maxRange,
-            tempLayerMask1); // Clamp to max array length
-        //hitInfo = new RaycastHit();
-
-        ExtDebug.DrawBoxCastOnHit(
-            position,
-            scale * 1.1f,
-            rotation,
-            direction,
-            maxRange,
-            new Color(0, 255, 0));
-
-        if (boxCastHitSomething3)
+            ~tempLayerMask1);
+        Debug.DrawLine(position, position - direction.normalized * 2, new Color(255, 0, 0));
+        Debug.Log(boxCastHitSomething1);
+        if (boxCastHitSomething1)
         {
-            //Debug.Log("BoxHit");
-            hitInfo = hit4;
-            endpoint = position + (direction * (hit.distance));
-            Debug.DrawLine(position, endpoint);
-            Debug.DrawLine(position, hit4.point, new Color(0, 255, 0));
-            //endpoint = Vector3.zero;
-            orientRay.transform.position = position;
-            orientRay.transform.LookAt(endpoint);
-            finalDirectionObj = orientRay;
+            hitInfo = boxHit1;
+            endpoint = boxHit1.point;
             finalPosition = position;
+            finalDirectionObj = orientRay;
             return true;
         }
-        else
-        {
-            //Debug.Log("BoxHit");
-            hitInfo = hit4;
-            endpoint = position + (direction * (hit.distance));
-            Debug.DrawLine(position, endpoint);
-            Debug.DrawLine(position, hit4.point, new Color(0, 255, 0));
-            //endpoint = Vector3.zero;
-            orientRay.transform.position = position;
-            orientRay.transform.LookAt(endpoint);
-            finalDirectionObj = orientRay;
-            finalPosition = position;
-            return false;
-        }
+        hitInfo = new RaycastHit();
+        endpoint = position + (direction * maxRange);
+        finalPosition = position;
+        finalDirectionObj = orientRay;
+        return false;
     }
 
     void UpdateCamera(ScriptableRenderContext SRC, Camera camera)
@@ -797,7 +711,7 @@ public class Portal : MonoBehaviour
 
     void LateUpdate()
     {
-        
+
         // Calculate virtual camera position and rotation
 
         var virtualPosition = TransformPositionBetweenPortals(this, targetPortal, refPos);
