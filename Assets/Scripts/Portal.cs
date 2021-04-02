@@ -407,7 +407,7 @@ public class Portal : MonoBehaviour
                 rotation,
                 rangeIfNotHit,
                 ~tempLayerMask); // Clamp to max array length
-            hitInfo = new RaycastHit(); // Dummy
+            //hitInfo = new RaycastHit(); // Dummy
 
             ExtDebug.DrawBoxCastOnHit(
                 position,
@@ -415,7 +415,7 @@ public class Portal : MonoBehaviour
                 rotation,
                 direction,
                 maxRange,
-                new Color(255, 0, 0));
+                new Color(255, 255, 0));
             if (!boxCastHitSomething)
             {
                 //Debug.Log("BoxNotHit");
@@ -445,6 +445,7 @@ public class Portal : MonoBehaviour
         }
         else
         {
+            LayerMask tempLayerMask = ~layerMask | (1 << 16);
             var boxCastHitSomething2 = Physics.BoxCast(
                 position,
                 scale,
@@ -452,8 +453,8 @@ public class Portal : MonoBehaviour
                 out var hit3,
                 rotation,
                 maxRange,
-                layerMask | 1 << 16); // Clamp to max array length
-            hitInfo = new RaycastHit(); // Dummy
+                ~tempLayerMask); // Clamp to max array length
+            //hitInfo = new RaycastHit(); // Dummy
 
             ExtDebug.DrawBoxCastOnHit(
                 position,
@@ -461,7 +462,7 @@ public class Portal : MonoBehaviour
                 rotation,
                 direction,
                 maxRange,
-                new Color(255, 0, 0));
+                new Color(255, 0, 255));
             var portalTemp = hit.collider.GetComponent<Portal>();
             if (boxCastHitSomething2 && !portalTemp)
             {
@@ -514,23 +515,25 @@ public class Portal : MonoBehaviour
 
         // If the object hit is not a portal, then congrats! We stop here and report back that we hit something.
 
+        LayerMask tempLayerMask1 = ~layerMask | (1 << 16);
+
         var boxCastHitSomething3 = Physics.BoxCast(
             position,
             scale,
             direction,
             out var hit4,
             rotation,
-            maxRange - hit.distance,
-            layerMask); // Clamp to max array length
-        hitInfo = new RaycastHit();
+            maxRange,
+            tempLayerMask1); // Clamp to max array length
+        //hitInfo = new RaycastHit();
 
         ExtDebug.DrawBoxCastOnHit(
             position,
-            scale,
+            scale * 1.1f,
             rotation,
             direction,
-            maxRange - hit.distance,
-            new Color(255, 0, 0));
+            maxRange,
+            new Color(0, 255, 0));
 
         if (boxCastHitSomething3)
         {
@@ -538,7 +541,7 @@ public class Portal : MonoBehaviour
             hitInfo = hit4;
             endpoint = position + (direction * (hit.distance));
             Debug.DrawLine(position, endpoint);
-            Debug.DrawLine(position, hit.point, new Color(0, 255, 0));
+            Debug.DrawLine(position, hit4.point, new Color(0, 255, 0));
             //endpoint = Vector3.zero;
             orientRay.transform.position = position;
             orientRay.transform.LookAt(endpoint);
@@ -548,9 +551,12 @@ public class Portal : MonoBehaviour
         }
         else
         {
-            //Debug.Log("BoxNotHit");
-            hitInfo = new RaycastHit(); // Dummy
-            endpoint = position + (direction * (maxRange));
+            //Debug.Log("BoxHit");
+            hitInfo = hit4;
+            endpoint = position + (direction * (hit.distance));
+            Debug.DrawLine(position, endpoint);
+            Debug.DrawLine(position, hit4.point, new Color(0, 255, 0));
+            //endpoint = Vector3.zero;
             orientRay.transform.position = position;
             orientRay.transform.LookAt(endpoint);
             finalDirectionObj = orientRay;
