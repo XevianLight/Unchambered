@@ -304,7 +304,7 @@ public class Portal : MonoBehaviour
 
         // If the object hit is not a portal, then congrats! We stop here and report back that we hit something.
 
-        endpoint = position + (direction * (maxRange - hit.distance));
+        endpoint = hit.point;
         hitInfo = hit;
         //endpoint = Vector3.zero;
         orientRay.transform.position = position;
@@ -663,7 +663,31 @@ public class Portal : MonoBehaviour
         var portalableObject = other.GetComponent<PortalableObject>();
         if (portalableObject)
         {
-            objectsInPortal.Add(portalableObject);
+            if (portalableObject.GetComponent<CubeScript>())
+            {
+                if (!portalableObject.GetComponent<CubeScript>().held)
+                    objectsInPortal.Add(portalableObject);
+            }
+            else
+            {
+                objectsInPortal.Add(portalableObject);
+            }
+            GameObject clone = new GameObject(other.name + " clone");
+            UnityEditorInternal.ComponentUtility.CopyComponent(other.GetComponent<MeshRenderer>());
+            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(clone);
+            UnityEditorInternal.ComponentUtility.CopyComponent(other.GetComponent<MeshFilter>());
+            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(clone);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (GameObject.Find(other.name + " clone"))
+        {
+            GameObject clone = GameObject.Find(other.name + " clone");
+            clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
+            clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
+            clone.transform.localScale = other.transform.localScale;
         }
     }
 
@@ -672,7 +696,20 @@ public class Portal : MonoBehaviour
         var portalableObject = other.GetComponent<PortalableObject>();
         if (portalableObject)
         {
-            objectsInPortal.Remove(portalableObject);
+            if (portalableObject.GetComponent<CubeScript>())
+            {
+                if (!portalableObject.GetComponent<CubeScript>().held)
+                    objectsInPortal.Remove(portalableObject);
+            }
+            else
+            {
+                objectsInPortal.Remove(portalableObject);
+            }
+            if (GameObject.Find(other.name + " clone"))
+            {
+                GameObject clone = GameObject.Find(other.name + " clone");
+                Destroy(clone);
+            }
         }
     }
 

@@ -52,6 +52,9 @@ public class CubeScript : MonoBehaviour
     public bool scaling = false;
     public AnimationCurve test;
 
+    public bool inPortal = false;
+    public MouseLook mouseLook;
+
 
 
     // Start is called before the first frame update
@@ -119,7 +122,7 @@ public class CubeScript : MonoBehaviour
         }
         if (held)
         {
-            rb.isKinematic = true;
+            //rb.isKinematic = true;
             isParentHeld = false;
             if (areaObject)
             {
@@ -206,7 +209,7 @@ public class CubeScript : MonoBehaviour
         }
         else
         {
-            //rb.isKinematic = false;
+            rb.isKinematic = false;
             if (!saveVectors)
             {
                 endScale = transform.lossyScale;
@@ -223,16 +226,16 @@ public class CubeScript : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.tag == "PlaceableArea" && !collision.GetComponent<BoxScript>().occupied && !insideSub && collision.transform.lossyScale.magnitude >= transform.lossyScale.magnitude && !areaObject)
+        if (other.tag == "PlaceableArea" && !other.GetComponent<BoxScript>().occupied && !insideSub && other.transform.lossyScale.magnitude >= transform.lossyScale.magnitude && !areaObject)
         {
             //if (collision.transform.parent){
             //if (!collision.transform.parent.GetComponent<CubeScript>().held){
-            areaObject = collision.gameObject;
+            areaObject = other.gameObject;
             placeInArea = true;
             if (!held)
-                collision.GetComponent<BoxScript>().occupied = true;
+                other.GetComponent<BoxScript>().occupied = true;
             //}
             //}else{
             //areaObject = collision.gameObject;
@@ -240,6 +243,14 @@ public class CubeScript : MonoBehaviour
             //if (!held)
             //collision.GetComponent<BoxScript>().occupied = true;
             //}
+        }
+
+        if (other.gameObject.layer == 16)
+        {
+            if (gameObject.GetComponent<SpringJoint>())
+            {
+                mouseLook.SwapJointType(true);
+            }
         }
     }
 
@@ -280,8 +291,19 @@ public class CubeScript : MonoBehaviour
     {
         if (other.GetComponent<Rigidbody>())
         {
-            if (!areaObject || held)
-                other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+            //if (!areaObject || held)
+                //other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.layer == 16)
+        {
+            if (gameObject.GetComponent<FixedJoint>())
+            {
+                mouseLook.SwapJointType(false);
+            }
         }
     }
 }
