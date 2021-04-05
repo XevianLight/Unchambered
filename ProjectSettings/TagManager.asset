@@ -8,6 +8,7 @@ TagManager:
   - PlaceableArea
   - Surface
   - Portal
+  - Gravity
   layers:
   - Default
   - TransparentFX

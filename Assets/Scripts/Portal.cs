@@ -230,7 +230,7 @@ public class Portal : MonoBehaviour
         // Useful for preventing a raycast through a portal from hitting the target portal from the back,
         // which makes a raycast unable to go through a portal since it'll just be absorbed by the target portal's trigger.
 
-        var ignoreObjectOriginalLayer = 0;
+        var ignoreObjectOriginalLayer = 16;
         if (ignoreObject)
         {
             ignoreObjectOriginalLayer = ignoreObject.layer;
@@ -366,7 +366,7 @@ public class Portal : MonoBehaviour
         // Useful for preventing a raycast through a portal from hitting the target portal from the back,
         // which makes a raycast unable to go through a portal since it'll just be absorbed by the target portal's trigger.
 
-        var ignoreObjectOriginalLayer = 0;
+        var ignoreObjectOriginalLayer = 16;
         if (ignoreObject)
         {
             ignoreObjectOriginalLayer = ignoreObject.layer;
@@ -391,6 +391,9 @@ public class Portal : MonoBehaviour
         Debug.Log(raycastHitSomething);
         //Debug.DrawLine(position, position + (direction * maxRange), new Color(255, 255, 0));
 
+        if (ignoreObject)
+            ignoreObject.layer = ignoreObjectOriginalLayer;
+
 
         // If no objects are hit, the recursion ends here, with no effect
 
@@ -398,13 +401,14 @@ public class Portal : MonoBehaviour
         {
             LayerMask tempLayerMask = ~layerMask | (1 << 16);
             var boxCastHitSomething = Physics.BoxCast(
-                position,
+                position - direction.normalized,
                 scale,
                 direction,
                 out var boxHit,
                 rotation,
-                maxRange,
+                maxRange + 1,
                 ~tempLayerMask);
+            ExtDebug.DrawBoxCastBox(position - direction.normalized, scale, rotation, direction, maxRange + 1, new Color(0, 255, 0));
             if (boxCastHitSomething)
             {
                 hitInfo = boxHit;
@@ -455,15 +459,16 @@ public class Portal : MonoBehaviour
 
         LayerMask tempLayerMask1 = ~layerMask | (1 << 16);
         var boxCastHitSomething1 = Physics.BoxCast(
-            position,
+            position - direction.normalized,
             scale,
             direction,
             out var boxHit1,
             rotation,
-            maxRange,
+            maxRange + 1,
             ~tempLayerMask1);
         Debug.DrawLine(position, position - direction.normalized * 2, new Color(255, 0, 0));
         Debug.Log(boxCastHitSomething1);
+        ExtDebug.DrawBoxCastBox(position - direction.normalized, scale, rotation, direction, maxRange + 1, new Color(255, 0, 0));
         if (boxCastHitSomething1)
         {
             hitInfo = boxHit1;
@@ -672,11 +677,8 @@ public class Portal : MonoBehaviour
             {
                 objectsInPortal.Add(portalableObject);
             }
-            GameObject clone = new GameObject(other.name + " clone");
-            UnityEditorInternal.ComponentUtility.CopyComponent(other.GetComponent<MeshRenderer>());
-            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(clone);
-            UnityEditorInternal.ComponentUtility.CopyComponent(other.GetComponent<MeshFilter>());
-            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(clone);
+            Type[] components = { typeof(MeshFilter), typeof(MeshRenderer), typeof(Collider) };
+            GameObject clone = CloneWithComponents(other.gameObject, components);
         }
     }
 
@@ -778,6 +780,23 @@ public class Portal : MonoBehaviour
         var visiblePortalResourcesList = new List<VisiblePortalResources>();
         //var plane = new Plane(normalVisible.forward, transform.position + normalInvisible.forward * 0.01f);
         //vectorPlane = new Vector4(plane.normal.x, plane.normal.y, plane.normal.z, plane.distance);
+    }
+
+    private GameObject CloneWithComponents(GameObject source, Type[] componentTypes)
+    {
+        GameObject cloneInternal = new GameObject(source.name + " clone");
+        CopyComponents(source, cloneInternal, componentTypes);
+        cloneInternal.layer = 2;
+        return cloneInternal;
+    }
+
+    public static void CopyComponents(GameObject source, GameObject target, Type[] componentTypes)
+    {
+        foreach (Type t in componentTypes)
+        {
+            UnityEditorInternal.ComponentUtility.CopyComponent(source.GetComponent(t));
+            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(target);
+        }
     }
 
     void OnApplicationQuit()

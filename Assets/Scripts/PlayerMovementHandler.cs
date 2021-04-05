@@ -16,24 +16,33 @@ public class PlayerMovementHandler : MonoBehaviour
     public bool IsGrounded = false;
     public float speed = 3f;
     float maxSpeed = 100.0f;
-	public float force;
+    public float force;
     public float minVel = 0.001f;
     float xVel;
     float yVel;
     float zVel;
     public Vector3 vel;
     public float zoomSpeed = 0.1f;
+    public Vector3 gravity = Physics.gravity;
+    public MouseLook ml;
+    public ConstantForce cf;
+    public GameObject axis;
+    Quaternion upRotation = Quaternion.identity;
+    bool enter;
     // Start is called before the first frame update
     void Start()
     {
         maxSpeed = speed;
-	    //force = maxSpeed * 2;
+        //ml = GetComponent<MouseLook>();
+        //force = maxSpeed * 2;
     }
 
     // Update is called once per frame
-	void FixedUpdate()
+    void FixedUpdate()
     {
-	    //force = maxSpeed * 2;
+        //cf.relativeForce = gravity;
+        //axis.transform.rotation = Quaternion.Lerp(axis.transform.rotation, upRotation, Time.deltaTime * 10);
+        //force = maxSpeed * 2;
         zVel = transform.InverseTransformDirection(rb.velocity).z;
         xVel = transform.InverseTransformDirection(rb.velocity).x;
         vel = new Vector3((Mathf.RoundToInt(xVel * 10000)) / 100, 0, (Mathf.RoundToInt(zVel * 10000)) / 100);
@@ -86,7 +95,7 @@ public class PlayerMovementHandler : MonoBehaviour
             }
             if (Input.GetKey(JumpKey))
             {
-                rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
+                rb.AddForce(transform.up * jumpForce);
                 IsGrounded = false;
             }
         }
@@ -96,7 +105,7 @@ public class PlayerMovementHandler : MonoBehaviour
         }
         else
         {
-	        Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 80, zoomSpeed * Time.deltaTime);
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 80, zoomSpeed * Time.deltaTime);
         }
         //rb.velocity = Vector3.ClampMagnitude(new Vector3(rb.velocity.x, 0, rb.velocity.z), maxSpeed);
     }
@@ -109,5 +118,56 @@ public class PlayerMovementHandler : MonoBehaviour
     private void OnCollisionExit(Collision collision)
     {
         IsGrounded = false;
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Surface")    
+        {                              
+        }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Surface")
+        {
+            gravity = other.transform.up * -9.8f;
+            //ml.upRotation = other.transform.eulerAngles;
+            //upRotation = other.transform.rotation;
+            if (other.bounds.Contains(transform.position))
+            {
+                if (!enter)
+                {
+                    //var relVelocity = transform.TransformDirection(new Vector3(-rb.velocity.x, rb.velocity.y, -rb.velocity.z));
+                    //rb.velocity = other.transform.TransformDirection(relVelocity);
+                    transform.parent = other.transform;
+                    ml.tempRotation = other.transform.rotation;
+                    ml.rotation.y -= other.transform.eulerAngles.y;
+                    enter = true;
+                }
+            }
+            else
+            {
+                if (enter)
+                {
+                    //var relVelocity = transform.InverseTransformDirection(new Vector3(-rb.velocity.x, rb.velocity.y, -rb.velocity.z));
+                    //rb.velocity = other.transform.TransformDirection(relVelocity);
+                    gravity = Physics.gravity;
+                    //ml.upRotation = Vector3.up;
+                    //upRotation = Quaternion.identity;
+                    ml.tempRotation = other.transform.rotation;
+                    ml.rotation.y += other.transform.eulerAngles.y;
+                    transform.parent = null;
+                    enter = false;
+                }
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Surface")
+        {
+        }
     }
 }

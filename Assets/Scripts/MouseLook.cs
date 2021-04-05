@@ -148,7 +148,64 @@ public class MouseLook : MonoBehaviour
 
         RaycastHit hit;
 
-        var recursiveRayCast = Portal.RaycastRecursive(
+        //var recursiveRayCast = Portal.RaycastRecursive(
+        //    cameraPosition,
+        //    cameraDirection,
+        //    range,
+        //    ~pickupLayer,
+        //    8,
+        //    out endpoint,
+        //    out hit,
+        //    out rotationVector,
+        //    out finalPosition);
+
+
+        //jointTarget.transform.position = endpoint + hit.normal * cs.scale;
+
+        /*if (heldObject)
+        {
+            var recursiveRayCast = Portal.RaycastRecursive(
+                cameraPosition,
+                cameraDirection,
+                range,
+                ~pickupLayer,
+                8,
+                out endpoint,
+                out hit,
+                out rotationVector,
+                out finalPosition);
+            if (recursiveRayCast)
+            {
+
+                var recursiveBoxCast = Portal.BoxcastRecursive(
+                    cameraPosition,
+                    heldObject.transform.lossyScale / 2,
+                    cameraDirection,
+                    heldObject.transform.rotation,
+                    range,
+                    rangeIfNotHit,
+                    ~pickupLayer,
+                    8,
+                    out endpoint,
+                    out hit,
+                    out rotationVector,
+                    out finalPosition);
+                jointTarget.transform.position = finalPosition + (rotationVector.transform.forward * (hit.distance - 1));
+
+                if (recursiveBoxCast)
+                {
+                    jointTarget.transform.position = finalPosition + (rotationVector.transform.forward * (hit.distance - 1));
+                }
+                else
+                {
+                    jointTarget.transform.position = endpoint;
+                }
+            }
+            else { jointTarget.transform.position = endpoint; }
+        }
+        else
+        {
+            var recursiveRayCast = Portal.RaycastRecursive(
             cameraPosition,
             cameraDirection,
             range,
@@ -158,132 +215,206 @@ public class MouseLook : MonoBehaviour
             out hit,
             out rotationVector,
             out finalPosition);
+            jointTarget.transform.position = endpoint;
+        }*/
 
 
-        jointTarget.transform.position = endpoint;
-        if (!jointBreak)
+
+        //if (!jointBreak)
+        //{
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
 
-                // Does the object exist and can it be picked up
-                if (objectHit != null && canBePickedUp)
+            // Does the object exist and can it be picked up
+            if (objectHit != null && canBePickedUp)
+            {
+                heldObject = objectHit;
+                cs = heldObject.GetComponent<CubeScript>();
+                rb = heldObject.GetComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+                /*springJoint = heldObject.AddComponent<SpringJoint>();
+                springJoint.autoConfigureConnectedAnchor = false;
+                springJoint.connectedBody = jointTarget.GetComponent<Rigidbody>();
+                springJoint.spring = 500;
+                springJoint.damper = 5;
+                springJoint.connectedAnchor = Vector3.zero;
+                springJoint.anchor = Vector3.zero;
+                //springJoint.breakForce = 500f;
+                jointTarget.transform.rotation = heldObject.transform.rotation;*//*
+                configurableJoint = heldObject.AddComponent<ConfigurableJoint>();
+                configurableJoint.autoConfigureConnectedAnchor = false;
+                configurableJoint.connectedBody = jointTarget.GetComponent<Rigidbody>();
+                configurableJoint.anchor = Vector3.zero;
+                configurableJoint.connectedAnchor = Vector3.zero;
+                configurableJoint.xMotion = ConfigurableJointMotion.Locked;
+                configurableJoint.yMotion = ConfigurableJointMotion.Locked;
+                configurableJoint.zMotion = ConfigurableJointMotion.Locked;
+                hadJoint = true;*/
+
+
+
+                // Does the object have a child that should be rotated instead of itself?
+                if (cs.isLightParent)
                 {
-                    heldObject = objectHit;
-                    cs = heldObject.GetComponent<CubeScript>();
-                    rb = heldObject.GetComponent<Rigidbody>();
-                    rb.useGravity = false;
-                    /*springJoint = heldObject.AddComponent<SpringJoint>();
-                    springJoint.autoConfigureConnectedAnchor = false;
-                    springJoint.connectedBody = jointTarget.GetComponent<Rigidbody>();
-                    springJoint.spring = 500;
-                    springJoint.damper = 5;
-                    springJoint.connectedAnchor = Vector3.zero;
-                    springJoint.anchor = Vector3.zero;
-                    //springJoint.breakForce = 500f;
-                    jointTarget.transform.rotation = heldObject.transform.rotation;*/
-                    configurableJoint = heldObject.AddComponent<ConfigurableJoint>();
-                    configurableJoint.autoConfigureConnectedAnchor = false;
-                    configurableJoint.connectedBody = jointTarget.GetComponent<Rigidbody>();
-                    configurableJoint.anchor = Vector3.zero;
-                    configurableJoint.connectedAnchor = Vector3.zero;
-                    configurableJoint.xMotion = ConfigurableJointMotion.Locked;
-                    configurableJoint.yMotion = ConfigurableJointMotion.Locked;
-                    configurableJoint.zMotion = ConfigurableJointMotion.Locked;
-                    hadJoint = true;
-
-
-
-                    // Does the object have a child that should be rotated instead of itself?
-                    if (cs.isLightParent)
+                    // If so, rotate the child instead
+                    foreach (Transform t in heldObject.transform)
                     {
-                        // If so, rotate the child instead
-                        foreach (Transform t in heldObject.transform)
+                        if (t.gameObject.name == "LightCube")
                         {
-                            if (t.gameObject.name == "LightCube")
-                            {
-                                rotateChild = true; // Tells the object to rotate the child
-                                rotateRelativeCamera = false; // Camera relative rotation is disorienting for child rotation
-                                heldChild = t.gameObject;
-                            }
+                            rotateChild = true; // Tells the object to rotate the child
+                            rotateRelativeCamera = false; // Camera relative rotation is disorienting for child rotation
+                            heldChild = t.gameObject;
                         }
                     }
-                    else
-                    {
-                        // If not, rotate itself
-                        rotateChild = false; // Tells the object to rotate itself
-                        rotateRelativeCamera = true;
-                    }
-                    heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
                 }
-            }
-
-            if (Input.GetMouseButton(0))
-            {
-                // Is an object being held?
-                if (heldObject)
+                else
                 {
-                    Vector3 heldPosition = heldObject.transform.position;
-                    Quaternion heldRotation;
-                    //cs = heldObject.GetComponent<CubeScript>();
-                    // Which object's rotation should be tracked?
-                    heldRotation = rotateChild ? heldChild.transform.rotation : heldObject.transform.rotation;
-
-                    // For velocity
-                    heldObjectPositionOld = heldPosition;
-
-
-                    // Make the held object kinematic, it should not be affected by gravity or collisions
-                    rb.isKinematic = true;
-
-                    // Is the object allowed to snap to an area when released?
-                    if (cs.snappingEnabled)
-                    {
-                        cs.snapAngle = snapAngle;
-                        cs.held = true;
-                    }
-
-                    if (GetComponent<SpringJoint>())
-                        GetComponent<SpringJoint>().spring = 1000 / cs.scale;
-
-                    bool rayCast = Physics.Raycast(
-                        cameraPosition,
-                        cameraDirection,
-                        out portalHit,
-                        range,
-                        1 << 16);
-
-                    if (rayCast)
-                    {
-                        if (!doWarp)
-                        {
-                            portal = portalHit.collider.GetComponent<Portal>();
-                            heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
-                            heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
-                            doWarp = true;
-                        }
-                    }
-                    else
-                    {
-                        //jointTarget.transform.rotation = heldObject.transform.rotation;
-                        if (doWarp)
-                        {
-
-                            heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
-                            heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
-                            doWarp = false;
-                        }
-                    }
-
-                    difference = heldObject.transform.position - jointTarget.transform.position;
-
-
+                    // If not, rotate itself
+                    rotateChild = false; // Tells the object to rotate itself
+                    rotateRelativeCamera = true;
                 }
-            }
-            else
-            {
+                heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
             }
         }
+
+        if (Input.GetMouseButton(0))
+        {
+            // Is an object being held?
+            if (heldObject)
+            {
+                Vector3 heldPosition = heldObject.transform.position;
+                Quaternion heldRotation;
+                //cs = heldObject.GetComponent<CubeScript>();
+                // Which object's rotation should be tracked?
+                heldRotation = rotateChild ? heldChild.transform.rotation : heldObject.transform.rotation;
+
+                // For velocity
+                heldObjectPositionOld = heldPosition;
+
+
+                // Make the held object kinematic, it should not be affected by gravity or collisions
+                rb.isKinematic = true;
+
+                // Is the object allowed to snap to an area when released?
+                if (cs.snappingEnabled)
+                {
+                    cs.snapAngle = snapAngle;
+                    cs.held = true;
+                }
+
+                if (GetComponent<SpringJoint>())
+                    GetComponent<SpringJoint>().spring = 1000 / cs.scale;
+
+                bool rayCast = Physics.Raycast(
+                    cameraPosition,
+                    cameraDirection,
+                    out portalHit,
+                    range,
+                    1 << 16);
+
+                if (rayCast)
+                {
+                    if (!doWarp)
+                    {
+                        portal = portalHit.collider.GetComponent<Portal>();
+                        //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
+                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
+                        doWarp = true;
+                    }
+                }
+                else
+                {
+                    //jointTarget.transform.rotation = heldObject.transform.rotation;
+                    if (doWarp)
+                    {
+
+                        //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
+                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
+                        doWarp = false;
+                    }
+                }
+
+                difference = heldObject.transform.position - jointTarget.transform.position;
+
+                if (Portal.BoxcastRecursive(
+                cameraPosition,
+                heldObject.transform.lossyScale / 2,
+                //cs.scaling ? (heldPosition - cameraPosition).normalized : cameraDirection,
+                Vector3.Slerp((heldPosition - cameraPosition).normalized, cameraDirection, cs.contractTime),
+                heldRotation,
+                range,
+                range,
+                ~pickupLayer,
+                16,
+                out endpoint,
+                out hit,
+                out rotationVector,
+                out finalPosition))
+                {
+                    //Debug.Log(endpoint);
+                    // If the boxcast hit an object, attempt to move the held object towards point without intersecting
+                    //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
+                    //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
+                    bool allowSnap = true;
+                    Debug.DrawLine(cameraPosition, hit.point, new Color(255, 255, 0));
+                    if (cs.connectedAreas.Length > 0)
+                    {
+                        foreach (Collider c in cs.connectedAreas)
+                        {
+                            allowSnap = cs.scaling ? false : !c.bounds.Contains(endpoint);
+                        }
+                    }
+
+
+                    if (allowSnap)
+                    {
+                        heldObject.transform.position = Vector3.Lerp(
+                            heldObject.transform.position,
+                            finalPosition + (rotationVector.transform.forward * (hit.distance - 1)),
+                            cs.expandCurve.Evaluate(1 / cs.scale));
+                        //heldObject.transform.position = finalPosition + (rotationVector.transform.forward * hit.distance);
+                    }
+
+                }
+                else
+                {
+                    //Debug.Log(endpoint);
+                    bool allowSnap = true;
+                    if (cs.connectedAreas.Length > 0)
+                    {
+                        foreach (Collider c in cs.connectedAreas)
+                        {
+                            allowSnap = cs.scaling ? false : !c.bounds.Contains(endpoint);
+                        }
+                    }
+                    // Otherwise, hold the object at a fixed distance from the boxcasts origin
+                    //Debug.Log((Vector3.Distance(heldObject.transform.position, endpoint)) + " Distance");
+                    //Debug.Log((2 * range * cs.lossyScale) + " Max Distance");
+                    // If the object is too far away, set position instead of lerp
+
+                    if (allowSnap)
+                    {
+                        heldObject.transform.position = Vector3.Lerp(
+                            heldObject.transform.position,
+                            endpoint,
+                            cs.expandCurve.Evaluate(1 / cs.scale));
+
+                        //heldObject.transform.position = endpoint;
+                    }
+                    //heldObject.transform.position = Vector3.Lerp(heldObject.transform.position, Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, (rangeIfNotHit))), snapSpeed * Time.deltaTime / heldObject.transform.lossyScale.magnitude);
+
+                    //heldObject.GetComponent<Rigidbody>().drag = 10 - Mathf.Abs(Vector3.Distance(Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, rangeIfNotHit)), heldObject.transform.position));
+                    //heldObject.GetComponent<Rigidbody>().AddForce((Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, rangeIfNotHit)) - heldObject.transform.position) * Mathf.Abs(Vector3.Distance(Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, rangeIfNotHit)), heldObject.transform.position)) * 10);
+                }
+
+
+            }
+        }
+        else
+        {
+        }
+        //}
 
 
         if (Input.GetMouseButtonUp(0) || jointBreak)

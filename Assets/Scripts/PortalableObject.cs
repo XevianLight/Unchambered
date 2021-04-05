@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 
 public class PortalableObject : MonoBehaviour
 {
@@ -7,6 +8,6 @@ public class PortalableObject : MonoBehaviour
 
     public void OnHasTeleported(Portal sender, Portal destination, Vector3 newPosition, Quaternion newRotation)
     {
-	    //HasTeleported?.Invoke(sender, destination, newPosition, newRotation);
+        //HasTeleported?.Invoke(sender, destination, newPosition, newRotation);
     }
 }
