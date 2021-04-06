@@ -677,7 +677,7 @@ public class Portal : MonoBehaviour
             {
                 objectsInPortal.Add(portalableObject);
             }
-            Type[] components = { typeof(MeshFilter), typeof(MeshRenderer), typeof(Collider) };
+            Type[] components = { typeof(MeshFilter), typeof(MeshRenderer)};
             GameObject clone = CloneWithComponents(other.gameObject, components);
         }
     }

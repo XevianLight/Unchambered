@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1024839749}
-  m_IndirectSpecularColor: {r: 0.28085265, g: 0.3660276, b: 0.49832964, a: 1}
+  m_IndirectSpecularColor: {r: 0.2808511, g: 0.36602545, b: 0.49832729, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -142,7 +142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 127
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &26992918
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -446,7 +446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &68882451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,7 +522,7 @@ MonoBehaviour:
   BackpedalKey: s
   JumpKey: space
   SprintKey: left shift
-  jumpForce: 5
+  jumpForce: 125
   friction: 5
   IsGrounded: 1
   speed: 3
@@ -2940,7 +2940,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -4348,7 +4348,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7649819376977538281, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: targetPortal
@@ -4522,7 +4522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -4746,7 +4746,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23410
+  m_Name: pb_Mesh22714
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5061,7 +5061,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -5103,7 +5103,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23534
+  m_Name: pb_Mesh22838
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5443,7 +5443,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5c044dbe18fa20d4e9d4da046676b77a, type: 2}
+  - {fileID: 2100000, guid: 143fb6e868bcccb4291d80222da1b97e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5894,7 +5894,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh22900
+  m_Name: pb_Mesh22198
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7694,12 +7694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collider: {fileID: 1266445492}
   portals:
-  - {fileID: 921015353}
   - {fileID: 1133263603}
-  - {fileID: 1569465432}
-  - {fileID: 1696438469}
-  - {fileID: 1767867332}
-  - {fileID: 2105487215}
 --- !u!65 &1266445492
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8699,7 +8694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 127
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1422424909
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -9131,7 +9126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSize: 100
-  resolutionScale: {x: 0.1, y: 0.1}
+  resolutionScale: {x: 0.75, y: 0.75}
 --- !u!4 &1569609698
 Transform:
   m_ObjectHideFlags: 0
@@ -9161,7 +9156,7 @@ MonoBehaviour:
   renderTextures:
   - {fileID: 8400000, guid: 8919b6ff20dd881479f7e7c8fbb3c31c, type: 2}
   - {fileID: 8400000, guid: e79e09fe6f101af428c70e15796ab3a0, type: 2}
-  renderScale: {x: 1, y: 1}
+  renderScale: {x: 0.75, y: 0.75}
 --- !u!1 &1576953120
 GameObject:
   m_ObjectHideFlags: 0
@@ -9410,7 +9405,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7325009590530373836, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_LocalScale.x
@@ -9991,7 +9986,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7649819376977538281, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: targetPortal
@@ -10690,7 +10685,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23272
+  m_Name: pb_Mesh22576
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -10932,7 +10927,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7325009590530373836, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_LocalScale.x
@@ -11381,7 +11376,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6654586185363939390, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7649819376977538281, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: targetPortal
@@ -12932,7 +12927,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh22946
+  m_Name: pb_Mesh22246
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -13096,7 +13091,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23644
+  m_Name: pb_Mesh22948
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -13965,7 +13960,7 @@ PrefabInstance:
       objectReference: {fileID: 1453170767}
     - target: {fileID: 8775259710128089830, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: visiblePortals.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8775259710128089830, guid: b0428cd6ac201e544bbd8231ba221782, type: 3}
       propertyPath: visiblePortals.Array.data[0]

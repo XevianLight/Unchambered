@@ -536,7 +536,7 @@ public class MouseLook : MonoBehaviour
             rotation.x += -Input.GetAxis("Mouse Y") * sensitivity;
             rotation.x = Mathf.Clamp(rotation.x, -clampUpper, -clampLower);
             //Debug.Log(target.transform.eulerAngles);
-            tempRotation = Quaternion.Lerp(tempRotation, Quaternion.identity, Time.deltaTime * 10);
+            tempRotation = Quaternion.Lerp(tempRotation, Quaternion.identity, Time.deltaTime * 5);
             target.transform.localRotation = Quaternion.Euler(tempRotation.eulerAngles.x, rotation.y, tempRotation.eulerAngles.z);
             target2.transform.localRotation = Quaternion.Euler(rotation.x, 0, 0);
         }

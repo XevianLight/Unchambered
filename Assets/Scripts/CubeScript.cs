@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 //using UnityEngine.Rendering.PostProcessing;
 
+
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Collider))]
 public class CubeScript : MonoBehaviour
 {
     Rigidbody rb;
