@@ -11,6 +11,8 @@ public class NearClipPlane : MonoBehaviour
 		GetComponent<Camera>().nearClipPlane = nearClipPlane;
 		GetComponent<Camera>().farClipPlane = farClipPlane;
 		//if (cam)
-			//cam.rect = new Rect(0, 0, 1, 2);
+		//cam.rect = new Rect(0, 0, 1, 2);
+		if (cam)
+			cam.aspect = Camera.main.aspect;
 	}
 }

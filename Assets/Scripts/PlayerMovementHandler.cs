@@ -29,6 +29,7 @@ public class PlayerMovementHandler : MonoBehaviour
     public GameObject axis;
     Quaternion upRotation = Quaternion.identity;
     bool enter;
+    public Camera[] cameras;
     // Start is called before the first frame update
     void Start()
     {
@@ -101,11 +102,17 @@ public class PlayerMovementHandler : MonoBehaviour
         }
         if (Input.GetKey("c"))
         {
-            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 20, zoomSpeed * Time.deltaTime);
+            foreach (Camera c in cameras)
+            {
+                c.fieldOfView = Mathf.Lerp(c.fieldOfView, 20, zoomSpeed * Time.deltaTime);
+            }
         }
         else
         {
-            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 80, zoomSpeed * Time.deltaTime);
+            foreach (Camera c in cameras)
+            {
+                c.fieldOfView = Mathf.Lerp(c.fieldOfView, 80, zoomSpeed * Time.deltaTime);
+            }
         }
         //rb.velocity = Vector3.ClampMagnitude(new Vector3(rb.velocity.x, 0, rb.velocity.z), maxSpeed);
     }

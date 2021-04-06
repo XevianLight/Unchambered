@@ -26,6 +26,7 @@ public class MouseLook : MonoBehaviour
     [Header("Misc Settings")]
     [Tooltip("Range to detect if held object hits surface")]
     public float range = 10f;
+    private float initialRange;
     [Tooltip("Distance at which to hold cube if surface is not hit")]
     public float rangeIfNotHit = 2f;
     [Tooltip("Should held objects rotate relative to the camera's perspective")]
@@ -104,6 +105,7 @@ public class MouseLook : MonoBehaviour
         //postProcessVolume.profile.TryGetSettings(out dof);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        initialRange = range;
     }
 
     void FixedUpdate()
@@ -146,82 +148,6 @@ public class MouseLook : MonoBehaviour
             crb = null;
         }
 
-        RaycastHit hit;
-
-        //var recursiveRayCast = Portal.RaycastRecursive(
-        //    cameraPosition,
-        //    cameraDirection,
-        //    range,
-        //    ~pickupLayer,
-        //    8,
-        //    out endpoint,
-        //    out hit,
-        //    out rotationVector,
-        //    out finalPosition);
-
-
-        //jointTarget.transform.position = endpoint + hit.normal * cs.scale;
-
-        /*if (heldObject)
-        {
-            var recursiveRayCast = Portal.RaycastRecursive(
-                cameraPosition,
-                cameraDirection,
-                range,
-                ~pickupLayer,
-                8,
-                out endpoint,
-                out hit,
-                out rotationVector,
-                out finalPosition);
-            if (recursiveRayCast)
-            {
-
-                var recursiveBoxCast = Portal.BoxcastRecursive(
-                    cameraPosition,
-                    heldObject.transform.lossyScale / 2,
-                    cameraDirection,
-                    heldObject.transform.rotation,
-                    range,
-                    rangeIfNotHit,
-                    ~pickupLayer,
-                    8,
-                    out endpoint,
-                    out hit,
-                    out rotationVector,
-                    out finalPosition);
-                jointTarget.transform.position = finalPosition + (rotationVector.transform.forward * (hit.distance - 1));
-
-                if (recursiveBoxCast)
-                {
-                    jointTarget.transform.position = finalPosition + (rotationVector.transform.forward * (hit.distance - 1));
-                }
-                else
-                {
-                    jointTarget.transform.position = endpoint;
-                }
-            }
-            else { jointTarget.transform.position = endpoint; }
-        }
-        else
-        {
-            var recursiveRayCast = Portal.RaycastRecursive(
-            cameraPosition,
-            cameraDirection,
-            range,
-            ~pickupLayer,
-            8,
-            out endpoint,
-            out hit,
-            out rotationVector,
-            out finalPosition);
-            jointTarget.transform.position = endpoint;
-        }*/
-
-
-
-        //if (!jointBreak)
-        //{
         if (Input.GetMouseButtonDown(0))
         {
 
@@ -302,6 +228,8 @@ public class MouseLook : MonoBehaviour
                     cs.snapAngle = snapAngle;
                     cs.held = true;
                 }
+
+                RaycastHit hit;
 
                 if (GetComponent<SpringJoint>())
                     GetComponent<SpringJoint>().spring = 1000 / cs.scale;
@@ -424,6 +352,7 @@ public class MouseLook : MonoBehaviour
             {
                 // If so, apply calculated velocity, toggle its held state, disable kinematic
                 rb.isKinematic = false;
+                heldObjectVelocity = Vector3.ClampMagnitude(heldObjectVelocity, 10);
                 rb.velocity = heldObjectVelocity;
                 rb.useGravity = true;
                 cs.held = false;

@@ -25,8 +25,8 @@ MonoBehaviour:
     overrideMaterial: {fileID: 2100000, guid: 75ad889c8f1778e42be7b13bb0cb45a1, type: 2}
     overrideMaterialPassIndex: 0
     overrideDepthState: 0
-    depthCompareFunction: 5
-    enableWrite: 1
+    depthCompareFunction: 0
+    enableWrite: 0
     stencilSettings:
       overrideStencilState: 0
       stencilReference: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
       overrideCamera: 0
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 60
+      cameraFieldOfView: 80
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
