@@ -388,7 +388,7 @@ public class Portal : MonoBehaviour
             out var hit,
             maxRange,
             layerMask); // Clamp to max array 
-        Debug.Log(raycastHitSomething);
+        //Debug.Log(raycastHitSomething);
         //Debug.DrawLine(position, position + (direction * maxRange), new Color(255, 255, 0));
 
         if (ignoreObject)
@@ -467,7 +467,7 @@ public class Portal : MonoBehaviour
             maxRange + 1,
             ~tempLayerMask1);
         Debug.DrawLine(position, position - direction.normalized * 2, new Color(255, 0, 0));
-        Debug.Log(boxCastHitSomething1);
+        //Debug.Log(boxCastHitSomething1);
         ExtDebug.DrawBoxCastBox(position - direction.normalized, scale, rotation, direction, maxRange + 1, new Color(255, 0, 0));
         if (boxCastHitSomething1)
         {

@@ -93,6 +93,7 @@ public class MouseLook : MonoBehaviour
     bool hadJoint = false;
     bool jointBreak = false;
     SpringJoint springJoint;
+    public AnimationCurve mouseCurve;
 
     public GameObject jointTarget;
     ConfigurableJoint configurableJoint;
@@ -157,7 +158,7 @@ public class MouseLook : MonoBehaviour
                 heldObject = objectHit;
                 cs = heldObject.GetComponent<CubeScript>();
                 rb = heldObject.GetComponent<Rigidbody>();
-                rb.useGravity = false;
+                //rb.useGravity = false;
                 rb.isKinematic = true;
                 /*springJoint = heldObject.AddComponent<SpringJoint>();
                 springJoint.autoConfigureConnectedAnchor = false;
@@ -354,7 +355,7 @@ public class MouseLook : MonoBehaviour
                 rb.isKinematic = false;
                 heldObjectVelocity = Vector3.ClampMagnitude(heldObjectVelocity, 10);
                 rb.velocity = heldObjectVelocity;
-                rb.useGravity = true;
+                //rb.useGravity = true;
                 cs.held = false;
                 //if (heldObject.GetComponent<SpringJoint>())
                 //    Destroy(heldObject.GetComponent<SpringJoint>());

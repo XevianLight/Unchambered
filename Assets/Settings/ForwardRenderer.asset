@@ -91,12 +91,8 @@ MonoBehaviour:
   m_Name: ForwardRenderer
   m_EditorClassIdentifier: 
   m_RendererFeatures:
-  - {fileID: -1128869141375553418}
   - {fileID: 4592741202100006679}
-  - {fileID: 3922328705637056379}
-  - {fileID: 3713986062866328153}
-  - {fileID: -2806731175011951157}
-  m_RendererFeatureMap: 76f068367f7355f017af7838cab1bc3f7b7fd0272de96e36592ae689a5ba8a33cbdd65f5dd7c0cd9
+  m_RendererFeatureMap: 17af7838cab1bc3f
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -116,9 +112,9 @@ MonoBehaviour:
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
-    stencilCompareFunction: 0
-    passOperation: 0
-    failOperation: 0
+    stencilCompareFunction: 3
+    passOperation: 5
+    failOperation: 2
     zFailOperation: 0
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
@@ -216,21 +212,21 @@ MonoBehaviour:
   m_Active: 0
   settings:
     passTag: NewRenderObjects
-    Event: 250
+    Event: 300
     filterSettings:
-      RenderQueueType: 1
+      RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
-        m_Bits: 262144
+        m_Bits: 256
       PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: 2881fe5be0c5a70418908f89e3928115, type: 2}
-    overrideMaterialPassIndex: 3
+    overrideMaterial: {fileID: 2100000, guid: 264abd3683f54dd4e81b7ea5f5b52d4e, type: 2}
+    overrideMaterialPassIndex: 0
     overrideDepthState: 0
     depthCompareFunction: 0
-    enableWrite: 0
+    enableWrite: 1
     stencilSettings:
       overrideStencilState: 0
-      stencilReference: 0
+      stencilReference: 1
       stencilCompareFunction: 8
       passOperation: 0
       failOperation: 0
@@ -239,4 +235,4 @@ MonoBehaviour:
       overrideCamera: 0
       restoreCamera: 0
       offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 80
+      cameraFieldOfView: 4

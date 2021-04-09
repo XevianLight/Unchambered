@@ -43,6 +43,7 @@ public class CubeScript : MonoBehaviour
     public bool hasPlayedSound = false;
     public AudioClip expand;
     AudioSource audioSource;
+    public AudioSource ambient;
     public Collider[] connectedAreas;
     public GameObject VFXScale;
     public float expandTime;
@@ -87,6 +88,10 @@ public class CubeScript : MonoBehaviour
             lt.intensity = transform.lossyScale.magnitude * lightModifier;
         }
         //scale = transform.localScale;
+        if (audioSource)
+            audioSource.pitch = Time.timeScale;
+        if (ambient)
+            ambient.pitch = Time.timeScale;
         if (areaObject)
         {
             if (childColliders)
@@ -112,8 +117,8 @@ public class CubeScript : MonoBehaviour
             if (areaObject.transform.parent)
             {
                 CubeScript cs = areaObject.transform.parent.GetComponent<CubeScript>();
-                isParentHeld = cs.held && !held ? true : cs.isParentHeld;
-                foreach (Collider c in getParentColliders())
+                isParentHeld = cs.held && !held || cs.isParentHeld;
+                foreach (Collider c in GetParentColliders())
                 {
                     foreach (Collider c1 in colliderObject.GetComponents<Collider>())
                     {
@@ -150,7 +155,7 @@ public class CubeScript : MonoBehaviour
                 }
                 if (areaObject.transform.parent)
                 {
-                    foreach (Collider c in getParentColliders())
+                    foreach (Collider c in GetParentColliders())
                     {
                         foreach (Collider c1 in colliderObject.GetComponents<Collider>())
                         {
@@ -206,8 +211,8 @@ public class CubeScript : MonoBehaviour
 
             //Debug.Log(transform.localScale.magnitude);
             BoxScript bs = areaObject.GetComponent<BoxScript>();
-            bs.forceOut = Mathf.Round(transform.localScale.magnitude) == 2 ? false : true;
-            scaling = (expandTime <= 1) ? true : false;
+            bs.forceOut = Mathf.Round(transform.localScale.magnitude) != 2;
+            scaling = (expandTime <= 1);
             test.AddKey(Mathf.Clamp(expandTime, 0, 1), scaling ? 1 : 0);
         }
         else
@@ -224,14 +229,14 @@ public class CubeScript : MonoBehaviour
             //Debug.Log(Vector3.Slerp(endScale, defaultScale, 0));
             transform.localScale = Vector3.Slerp(endScale, defaultScale, contractTime);
             hasPlayedSound = false;
-            scaling = (contractTime <= 1) ? true : false;
+            scaling = (contractTime <= 1);
             test.AddKey(Mathf.Clamp(contractTime, 0, 1), scaling ? 1 : 0);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "PlaceableArea" && !other.GetComponent<BoxScript>().occupied && !insideSub && other.transform.lossyScale.magnitude >= transform.lossyScale.magnitude && !areaObject)
+        if (other.CompareTag("PlaceableArea") && !other.GetComponent<BoxScript>().occupied && !insideSub && other.transform.lossyScale.magnitude >= transform.lossyScale.magnitude && !areaObject)
         {
             //if (collision.transform.parent){
             //if (!collision.transform.parent.GetComponent<CubeScript>().held){
@@ -262,7 +267,7 @@ public class CubeScript : MonoBehaviour
         return new Vector3(Mathf.Round(vect.x), Mathf.Round(vect.y), Mathf.Round(vect.z));
     }
 
-    public List<Collider> getParentColliders()
+    public List<Collider> GetParentColliders()
     {
         if (areaObject)
         {
@@ -273,7 +278,7 @@ public class CubeScript : MonoBehaviour
                     if (areaObject.transform.parent.parent.parent)
                     {
                         List<Collider> l = new List<Collider>(areaObject.transform.parent.GetComponent<CubeScript>().colliderObject.GetComponents<Collider>());
-                        l.AddRange(new List<Collider>(areaObject.transform.parent.GetComponent<CubeScript>().getParentColliders()));
+                        l.AddRange(new List<Collider>(areaObject.transform.parent.GetComponent<CubeScript>().GetParentColliders()));
                         return l;
                     }
                 }

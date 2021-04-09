@@ -39,7 +39,7 @@ public class PlayerMovementHandler : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         //cf.relativeForce = gravity;
         //axis.transform.rotation = Quaternion.Lerp(axis.transform.rotation, upRotation, Time.deltaTime * 10);
@@ -94,10 +94,10 @@ public class PlayerMovementHandler : MonoBehaviour
             {
                 rb.AddRelativeForce(new Vector3(0, 0, -friction) * zVel);
             }
-            if (Input.GetKey(JumpKey))
+            if (Input.GetKeyDown(JumpKey) && IsGrounded)
             {
-                rb.AddForce(transform.up * jumpForce);
                 IsGrounded = false;
+                rb.velocity = rb.velocity + (transform.up * jumpForce);
             }
         }
         if (Input.GetKey("c"))
@@ -119,12 +119,14 @@ public class PlayerMovementHandler : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        IsGrounded = true;
+        if (collision.gameObject.layer != 6)
+            IsGrounded = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        IsGrounded = false;
+        if (collision.gameObject.layer != 6)
+            IsGrounded = false;
     }
 
 
