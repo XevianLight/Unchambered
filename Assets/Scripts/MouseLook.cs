@@ -109,11 +109,6 @@ public class MouseLook : MonoBehaviour
         initialRange = range;
     }
 
-    void FixedUpdate()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {

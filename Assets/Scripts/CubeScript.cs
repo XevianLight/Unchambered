@@ -130,7 +130,7 @@ public class CubeScript : MonoBehaviour
         }
         if (held)
         {
-            //rb.isKinematic = true;
+            rb.isKinematic = true;
             isParentHeld = false;
             if (areaObject)
             {
@@ -217,7 +217,7 @@ public class CubeScript : MonoBehaviour
         }
         else
         {
-            rb.isKinematic = false;
+            //rb.isKinematic = false;
             if (!saveVectors)
             {
                 endScale = transform.lossyScale;

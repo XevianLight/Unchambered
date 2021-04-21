@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEditor;
+using System.Reflection;
 using RenderPipeline = UnityEngine.Rendering.RenderPipelineManager;
 
 
@@ -30,6 +31,8 @@ public class Portal : MonoBehaviour
 
     private HashSet<PortalableObject> objectsInPortal = new HashSet<PortalableObject>();
     private HashSet<PortalableObject> objectsInPortalToRemove = new HashSet<PortalableObject>();
+
+    private HashSet<GameObject> objectsToClone = new HashSet<GameObject>();
 
     public Portal[] visiblePortals;
 
@@ -507,6 +510,17 @@ public class Portal : MonoBehaviour
                 }
             }
         }
+
+        foreach (GameObject other in objectsToClone)
+        {
+            if (GameObject.Find(other.name + " clone"))
+            {
+                GameObject clone = GameObject.Find(other.name + " clone");
+                clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
+                clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
+                clone.transform.localScale = other.transform.localScale;
+            }
+        }
     }
 
     /*private void Update()
@@ -520,6 +534,7 @@ public class Portal : MonoBehaviour
     viewthroughRenderer.enabled = false;
     }
     }*/
+
 
     public void RenderViewthroughRecursive(
         Vector3 refPosition,
@@ -679,18 +694,24 @@ public class Portal : MonoBehaviour
             }
             Type[] components = { typeof(MeshFilter), typeof(MeshRenderer)};
             GameObject clone = CloneWithComponents(other.gameObject, components);
+
+        }
+
+        if (!objectsToClone.Contains(other.gameObject))
+        {
+            objectsToClone.Add(other.gameObject);
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (GameObject.Find(other.name + " clone"))
-        {
-            GameObject clone = GameObject.Find(other.name + " clone");
-            clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
-            clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
-            clone.transform.localScale = other.transform.localScale;
-        }
+        //if (GameObject.Find(other.name + " clone"))
+        //{
+        //    GameObject clone = GameObject.Find(other.name + " clone");
+        //    clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
+        //    clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
+        //    clone.transform.localScale = other.transform.localScale;
+        //}
     }
 
     private void OnTriggerExit(Collider other)
@@ -712,6 +733,10 @@ public class Portal : MonoBehaviour
                 GameObject clone = GameObject.Find(other.name + " clone");
                 Destroy(clone);
             }
+        }
+        if (objectsToClone.Contains(other.gameObject))
+        {
+            objectsToClone.Remove(other.gameObject);
         }
     }
 
@@ -794,8 +819,16 @@ public class Portal : MonoBehaviour
     {
         foreach (Type t in componentTypes)
         {
-            UnityEditorInternal.ComponentUtility.CopyComponent(source.GetComponent(t));
-            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(target);
+            if (!target.GetComponent<MeshFilter>())
+            {
+                MeshFilter meshFilter = target.AddComponent<MeshFilter>();
+                meshFilter.mesh = source.GetComponent<MeshFilter>().mesh;
+            }
+            if (!target.GetComponent<MeshRenderer>())
+            {
+                MeshRenderer meshRenderer = target.AddComponent<MeshRenderer>();
+                meshRenderer.material = source.GetComponent<MeshRenderer>().material;
+            }
         }
     }
 
@@ -805,5 +838,38 @@ public class Portal : MonoBehaviour
         run = false;
         StopCoroutine(WaitForFixedUpdateLoop());
         this.GetComponent<Portal>().enabled = false;
+    }
+}
+
+public static class ExtentionMethods
+{
+    public static T GetCopyOf<T>(this Component comp, T other) where T : Component
+    {
+        Type type = comp.GetType();
+        if (type != other.GetType()) return null; // type mis-match
+        BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.DeclaredOnly;
+        PropertyInfo[] pinfos = type.GetProperties(flags);
+        foreach (var pinfo in pinfos)
+        {
+            if (pinfo.CanWrite)
+            {
+                try
+                {
+                    pinfo.SetValue(comp, pinfo.GetValue(other, null), null);
+                }
+                catch { } // In case of NotImplementedException being thrown. For some reason specifying that exception didn't seem to catch it, so I didn't catch anything specific.
+            }
+        }
+        FieldInfo[] finfos = type.GetFields(flags);
+        foreach (var finfo in finfos)
+        {
+            finfo.SetValue(comp, finfo.GetValue(other));
+        }
+        return comp as T;
+    }
+
+    public static T AddComponent<T>(this GameObject go, T toAdd) where T : Component
+    {
+        return go.AddComponent<T>().GetCopyOf(toAdd) as T;
     }
 }

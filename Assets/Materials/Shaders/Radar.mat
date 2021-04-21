@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Area
-  m_Shader: {fileID: -6465566751694194690, guid: 0d81eda087036f741af947b4adeaf165, type: 3}
+  m_Name: Radar
+  m_Shader: {fileID: -6465566751694194690, guid: 352fbdf96df5bad4180893023a6de3d4, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -38,8 +38,8 @@ Material:
     m_Ints: []
     m_Floats:
     - Border: 0.1
-    - Scale: 1.01
+    - Scale: 1
     - _Offset: 0.5
     m_Colors:
-    - _Color: {r: 4, g: 0, b: 0, a: 0}
+    - _Color: {r: 0, g: 2, b: 0, a: 0}
   m_BuildTextureStacks: []

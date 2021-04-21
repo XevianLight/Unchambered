@@ -9,6 +9,7 @@ TagManager:
   - Surface
   - Portal
   - Gravity
+  - Conveyor
   layers:
   - Default
   - TransparentFX

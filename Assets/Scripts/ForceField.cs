@@ -31,18 +31,18 @@ public class ForceField : MonoBehaviour
         {
             Time.timeScale = timeScale;
             Time.fixedDeltaTime = Time.timeScale * 0.02f;
-            Debug.Log(Time.timeScale);
+            //Debug.Log(Time.timeScale);
             timeProgress = Mathf.Clamp(timeProgress, 0, 1);
             if (scaleTime)
             {
-                Debug.Log("slowdown");
+                //Debug.Log("slowdown");
                 timeScale = Mathf.Lerp(1, targetTime, timeProgress);
                 timeProgress += Time.unscaledDeltaTime;
                 timeProgress = Mathf.Clamp(timeProgress, 0, 1);
             }
             else
             {
-                Debug.Log("speedup");
+                //Debug.Log("speedup");
                 timeScale = Mathf.Lerp(1, targetTime, timeProgress);
                 timeProgress -= Time.unscaledDeltaTime;
                 timeProgress = Mathf.Clamp(timeProgress, 0, 1);
