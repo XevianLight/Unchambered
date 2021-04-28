@@ -47,7 +47,7 @@ Material:
     m_Floats:
     - AO: 1
     - Float_1: 10
-    - Float_2: 0.1
+    - Float_2: 1
     - Float_3: 1
     - Float_4: 1
     - Float_5: 10
