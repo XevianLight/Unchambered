@@ -168,11 +168,27 @@ public class PlayerMovementHandler : MonoBehaviour
                 }
             }
         }
+        if (Input.GetKey("c"))
+        {
+            foreach (Camera c in cameras)
+            {
+                c.fieldOfView = Mathf.Lerp(c.fieldOfView, 20, zoomSpeed * Time.deltaTime);
+            }
+        }
+        else
+        {
+            foreach (Camera c in cameras)
+            {
+                c.fieldOfView = Mathf.Lerp(c.fieldOfView, 80, zoomSpeed * Time.deltaTime);
+            }
+        }
 
         // We apply gravity manually for more tuning control
         //rb.AddForce(new Vector3(0, -gravity * rb.mass, 0));
 
         grounded = false;
+
+
     }
 
     private void OnCollisionEnter(Collision collision)

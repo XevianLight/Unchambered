@@ -243,7 +243,14 @@ public class MouseLook : MonoBehaviour
                     {
                         portal = portalHit.collider.GetComponent<Portal>();
                         //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
-                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
+                        if (portalHit.transform.parent != heldObject)
+                        {
+                            heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
+                            heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, heldObject.transform.localScale);
+                            cs.defaultScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.defaultScale);
+                            cs.initialScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.initialScale);
+                            cs.endScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.endScale);
+                        }
                         doWarp = true;
                     }
                 }
@@ -255,6 +262,10 @@ public class MouseLook : MonoBehaviour
 
                         //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
                         heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
+                        heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
+                        cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
+                        cs.initialScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.initialScale);
+                        cs.endScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.endScale);
                         doWarp = false;
                     }
                 }
@@ -343,6 +354,7 @@ public class MouseLook : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) || jointBreak)
         {
+            doWarp = false;
             // Is an object being held?
             if (heldObject)
             {

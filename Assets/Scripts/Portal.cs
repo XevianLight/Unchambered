@@ -64,6 +64,13 @@ public class Portal : MonoBehaviour
         return target.normalInvisible.rotation * Quaternion.Inverse(sender.normalVisible.rotation) * rotation;
     }
 
+    public static Vector3 TransformScaleBetweenPortals(Portal sender, Portal target, Vector3 scale)
+    {
+        var targetScale = target.normalInvisible.lossyScale;
+        var senderScale = sender.normalInvisible.lossyScale;
+        return scale.Multiply(new Vector3(targetScale.x / senderScale.x, targetScale.y / senderScale.y, targetScale.z / senderScale.z));
+    }
+
     /*private void OnEnable()
 	{
 	RenderPipeline.beginCameraRendering += UpdateCamera;
@@ -158,6 +165,7 @@ public class Portal : MonoBehaviour
             rb.velocity = targetPortal.transform.TransformDirection(relVelocity);
             var newPosition = TransformPositionBetweenPortals(this, targetPortal, portalableObject.transform.position);
             var newRotation = TransformRotationBetweenPortals(this, targetPortal, portalableObject.transform.rotation);
+            var newScale = TransformScaleBetweenPortals(this, targetPortal, portalableObject.transform.localScale);
             //Debug.Log(newRotation.eulerAngles);
             //Debug.Log(newRotation);
             if (portalableObject.tag == "Player")
@@ -167,8 +175,11 @@ public class Portal : MonoBehaviour
                 portalableObject.OnHasTeleported(this, targetPortal, newPosition, newRotation);
                 portalableObject.transform.position = newPosition;
                 portalableObject.transform.eulerAngles = new Vector3(newRotation.eulerAngles.x, portalableObject.transform.eulerAngles.y, newRotation.eulerAngles.z);
+                Debug.Log(newScale);
+                portalableObject.transform.localScale = newScale;
                 ml.tempRotation = newRotation;
                 ml.rotation.y = newRotation.eulerAngles.y;
+                ml.range *= TransformScaleBetweenPortals(this, targetPortal, Vector3.one).Average();
                 //portalableObject.transform.eulerAngles = new Vector3(newRotation.eulerAngles.x, ml.rotation.y, newRotation.eulerAngles.z);
             }
             else
@@ -176,6 +187,14 @@ public class Portal : MonoBehaviour
                 portalableObject.OnHasTeleported(this, targetPortal, newPosition, newRotation);
                 portalableObject.transform.position = newPosition;
                 portalableObject.transform.eulerAngles = newRotation.eulerAngles;
+                Debug.Log(newScale);
+                portalableObject.transform.localScale = newScale;
+                if (portalableObject.GetComponent<CubeScript>())
+                {
+                    portalableObject.GetComponent<CubeScript>().initialScale = portalableObject.GetComponent<CubeScript>().initialScale.Multiply(newScale);
+                    portalableObject.GetComponent<CubeScript>().defaultScale = portalableObject.GetComponent<CubeScript>().defaultScale.Multiply(newScale);
+                    portalableObject.GetComponent<CubeScript>().endScale = portalableObject.GetComponent<CubeScript>().endScale.Multiply(newScale);
+                }
             }
             // Object is no longer touching this side of the portal
 
@@ -294,7 +313,7 @@ public class Portal : MonoBehaviour
             return RaycastRecursiveInternal(
                 TransformPositionBetweenPortals(portal, portal.targetPortal, hit.point),
                 TransformDirectionBetweenPortals(portal, portal.targetPortal, direction),
-                (maxRange - hit.distance),
+                (maxRange - hit.distance) * TransformScaleBetweenPortals(portal, portal.targetPortal, Vector3.one).Average(),
                 layerMask,
                 maxRecursions,
                 out endpoint,// tempVector3,
@@ -446,7 +465,7 @@ public class Portal : MonoBehaviour
                     scale,
                     TransformDirectionBetweenPortals(portal, portal.targetPortal, direction),
                     rotation,
-                    (maxRange - hit.distance),
+                    (maxRange - hit.distance) * TransformScaleBetweenPortals(portal, portal.targetPortal, Vector3.one).Average(),
                     rangeIfNotHit,
                     layerMask,
                     maxRecursions,
@@ -518,7 +537,7 @@ public class Portal : MonoBehaviour
                 GameObject clone = GameObject.Find(other.name + " clone");
                 clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
                 clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
-                clone.transform.localScale = other.transform.localScale;
+                clone.transform.localScale = TransformScaleBetweenPortals(this, targetPortal, other.transform.localScale);
             }
         }
     }
@@ -871,5 +890,15 @@ public static class ExtentionMethods
     public static T AddComponent<T>(this GameObject go, T toAdd) where T : Component
     {
         return go.AddComponent<T>().GetCopyOf(toAdd) as T;
+    }
+
+    public static Vector3 Multiply(this Vector3 a, Vector3 b)
+    {
+        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
+
+    public static float Average(this Vector3 a)
+    {
+        return (a.x + a.y + a.z) / 3;
     }
 }
