@@ -174,6 +174,14 @@ public class MouseLook : MonoBehaviour
                 configurableJoint.zMotion = ConfigurableJointMotion.Locked;
                 hadJoint = true;*/
 
+                bool rayCast = Physics.Raycast(
+                cameraPosition,
+                cameraDirection,
+                out portalHit,
+                range,
+                1 << 16);
+
+                doWarp = rayCast;
 
 
                 // Does the object have a child that should be rotated instead of itself?
@@ -197,6 +205,45 @@ public class MouseLook : MonoBehaviour
                     rotateRelativeCamera = true;
                 }
                 heldAngularVelocity = rotateChild ? crb.angularVelocity : rb.angularVelocity;
+            }
+        }
+
+        if (heldObject)
+        {
+            bool rayCast = Physics.Raycast(
+                cameraPosition,
+                cameraDirection,
+                out portalHit,
+                range,
+                1 << 16);
+
+            if (rayCast)
+            {
+                if (!doWarp)
+                {
+                    portal = portalHit.collider.GetComponent<Portal>();
+                    //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
+                    if (portalHit.transform.parent != heldObject)
+                    {
+                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
+                        //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, heldObject.transform.localScale);
+                        cs.defaultScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.defaultScale);
+                    }
+                    doWarp = true;
+                }
+            }
+            else
+            {
+                //jointTarget.transform.rotation = heldObject.transform.rotation;
+                if (doWarp)
+                {
+
+                    //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
+                    heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
+                    //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
+                    cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
+                    doWarp = false;
+                }
             }
         }
 
@@ -225,52 +272,9 @@ public class MouseLook : MonoBehaviour
                     cs.held = true;
                 }
 
-                RaycastHit hit;
-
-                if (GetComponent<SpringJoint>())
-                    GetComponent<SpringJoint>().spring = 1000 / cs.scale;
-
-                bool rayCast = Physics.Raycast(
-                    cameraPosition,
-                    cameraDirection,
-                    out portalHit,
-                    range,
-                    1 << 16);
-
-                if (rayCast)
-                {
-                    if (!doWarp)
-                    {
-                        portal = portalHit.collider.GetComponent<Portal>();
-                        //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
-                        if (portalHit.transform.parent != heldObject)
-                        {
-                            heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
-                            heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, heldObject.transform.localScale);
-                            cs.defaultScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.defaultScale);
-                            cs.initialScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.initialScale);
-                            cs.endScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.endScale);
-                        }
-                        doWarp = true;
-                    }
-                }
-                else
-                {
-                    //jointTarget.transform.rotation = heldObject.transform.rotation;
-                    if (doWarp)
-                    {
-
-                        //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
-                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
-                        heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
-                        cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
-                        cs.initialScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.initialScale);
-                        cs.endScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.endScale);
-                        doWarp = false;
-                    }
-                }
-
                 difference = heldObject.transform.position - jointTarget.transform.position;
+
+                RaycastHit hit;
 
                 if (Portal.BoxcastRecursive(
                 cameraPosition,
@@ -354,7 +358,7 @@ public class MouseLook : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) || jointBreak)
         {
-            doWarp = false;
+            //doWarp = false;
             // Is an object being held?
             if (heldObject)
             {

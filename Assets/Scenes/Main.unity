@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1024839749}
-  m_IndirectSpecularColor: {r: 0.1727681, g: 0.21589208, b: 0.29782575, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1970,7 +1970,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &68882451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48172,9 +48172,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ExecuteInEditor: 1
   m_Bindings:
-  - {fileID: 829034462}
   - {fileID: 829034460}
   - {fileID: 829034465}
+  - {fileID: 829034462}
   - {fileID: 829034463}
   m_VisualEffect: {fileID: 829034457}
 --- !u!114 &829034462
@@ -67927,8 +67927,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ExecuteInEditor: 1
   m_Bindings:
-  - {fileID: 1319488843}
   - {fileID: 1319488847}
+  - {fileID: 1319488843}
   m_VisualEffect: {fileID: 1319488846}
 --- !u!73398921 &1319488845
 VFXRenderer:
@@ -68460,12 +68460,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRotation: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}
-  defaultScale: {x: 0, y: 0, z: 0}
+  defaultScale: {x: 0.25, y: 0.25, z: 0.25}
   targetScale: 1
   initialPosition: {x: 0, y: 0, z: 0}
   initialRotation: {x: 0, y: 0, z: 0, w: 0}
   initialScale: {x: 0.25, y: 0.25, z: 0.25}
-  endScale: {x: 0, y: 0, z: 0}
+  endScale: {x: 0.25, y: 0.25, z: 0.25}
   scaleFactor: 1
   scale: 0
   snapAngle: 45
@@ -77629,7 +77629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSize: 100
-  resolutionScale: {x: 0.1, y: 0.1}
+  resolutionScale: {x: 0.75, y: 0.75}
 --- !u!4 &1569609698
 Transform:
   m_ObjectHideFlags: 0
