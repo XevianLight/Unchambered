@@ -175,6 +175,10 @@ public class Portal : MonoBehaviour
             var newRotation = TransformRotationBetweenPortals(this, targetPortal, portalableObject.transform.rotation);
             var newVelocity = TransformDirectionBetweenPortals(this, targetPortal, rb.velocity);
             var newScale = TransformScaleBetweenPortals(this, targetPortal, portalableObject.transform.localScale);
+            if (portalableObject.GetComponent<ConstantForce>())
+            {
+                //portalableObject.GetComponent<ConstantForce>().force *= PortalScaleRatio(this, targetPortal);
+            }
             //Debug.Log(newRotation.eulerAngles);
             //Debug.Log(newRotation);
             if (portalableObject.tag == "Player")
@@ -190,7 +194,12 @@ public class Portal : MonoBehaviour
                 rb.velocity = newVelocity * PortalScaleRatio(this, targetPortal);
                 ml.range *= PortalScaleRatio(this, targetPortal);
                 if (ml.heldObject)
+                {
                     ml.heldObject.GetComponent<CubeScript>().defaultScale = TransformScaleBetweenPortals(this, targetPortal, ml.heldObject.GetComponent<CubeScript>().defaultScale);
+                    ml.heldObject.GetComponent<ConstantForce>().force *= PortalScaleRatio(this, targetPortal);
+                    ml.heldObject.GetComponent<CubeScript>().roomPortal = targetPortal;
+                    Debug.Log("warp player");
+                }
                 //portalableObject.transform.eulerAngles = new Vector3(newRotation.eulerAngles.x, ml.rotation.y, newRotation.eulerAngles.z);
             }
             else
@@ -201,10 +210,27 @@ public class Portal : MonoBehaviour
                 if (portalableObject.GetComponent<CubeScript>())
                 {
                     portalableObject.GetComponent<CubeScript>().defaultScale = newScale;
+                    portalableObject.GetComponent<ConstantForce>().force *= PortalScaleRatio(this, targetPortal);
                     portalableObject.transform.localScale = newScale;
                 }
                 rb.velocity = newVelocity * PortalScaleRatio(this, targetPortal);
+
+                if (transform.parent.name == "Portal Cube")
+                {
+                    if (portalableObject.GetComponent<CubeScript>())
+                    {
+                        portalableObject.GetComponent<CubeScript>().roomPortal = targetPortal;
+                    }
+                }
+                if (transform.parent.name == "ProCube Room")
+                {
+                    if (portalableObject.GetComponent<CubeScript>())
+                    {
+                        portalableObject.GetComponent<CubeScript>().roomPortal = null;
+                    }
+                }
             }
+
             // Object is no longer touching this side of the portal
 
             objectsInPortalToRemove.Add(portalableObject);
@@ -503,14 +529,18 @@ public class Portal : MonoBehaviour
         if (boxCastHitSomething1)
         {
             hitInfo = boxHit1;
-            endpoint = boxHit1.point;
             finalPosition = position;
+            endpoint = position + (direction * boxHit1.distance);
+            orientRay.transform.position = position;
+            orientRay.transform.LookAt(endpoint);
             finalDirectionObj = orientRay;
             return true;
         }
         hitInfo = new RaycastHit();
-        endpoint = position + (direction * maxRange);
         finalPosition = position;
+        endpoint = position + (direction * maxRange);
+        orientRay.transform.position = position;
+        orientRay.transform.LookAt(endpoint);
         finalDirectionObj = orientRay;
         return false;
     }
@@ -909,5 +939,18 @@ public static class ExtentionMethods
     public static float Average(this Vector3 a)
     {
         return (a.x + a.y + a.z) / 3;
+    }
+
+    public static Vector3 ClampMagnitude(this Vector3 v, float max, float min)
+    {
+        double sm = v.sqrMagnitude;
+        if (sm > (double)max * (double)max) return v.normalized * max;
+        else if (sm < (double)min * (double)min) return v.normalized * min;
+        return v;
+    }
+
+    public static Vector3 ClampComponents(this Vector3 v, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax)
+    {
+        return new Vector3(Mathf.Clamp(v.x, xMin, xMax), Mathf.Clamp(v.y, yMin, yMax), Mathf.Clamp(v.z, zMin, zMax));
     }
 }

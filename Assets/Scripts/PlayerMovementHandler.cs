@@ -134,12 +134,15 @@ public class PlayerMovementHandler : MonoBehaviour
 
     void FixedUpdate()
     {
+        cf.relativeForce = Physics.gravity * transform.localScale.Average();
+        gravity = -cf.relativeForce.y;
+        //Debug.Log(transform.lossyScale + " Player");
         if (grounded)
         {
             // Calculate how fast we should be moving
             Vector3 targetVelocity = Vector3.ClampMagnitude(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")), 1);
             targetVelocity = transform.TransformDirection(targetVelocity);
-            targetVelocity *= speed;
+            targetVelocity *= (speed * transform.localScale.magnitude);
 
             // Apply a force that attempts to reach our target velocity
             Vector3 velocity = rb.velocity;
@@ -282,7 +285,7 @@ public class PlayerMovementHandler : MonoBehaviour
     {
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
-        return Mathf.Sqrt(2 * jumpHeight * gravity);
+        return Mathf.Sqrt(2 * jumpHeight * gravity * transform.localScale.magnitude);
     }
 
 }

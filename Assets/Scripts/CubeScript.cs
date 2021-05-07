@@ -58,6 +58,7 @@ public class CubeScript : MonoBehaviour
 
     public bool inPortal = false;
     public MouseLook mouseLook;
+    public Portal roomPortal;
 
 
 
@@ -77,6 +78,10 @@ public class CubeScript : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if (GetComponent<ConstantForce>())
+        {
+            GetComponent<ConstantForce>().force = roomPortal ? Physics.gravity * Portal.PortalScaleRatio(roomPortal.targetPortal, roomPortal) : Physics.gravity;
+        }
         if (VFXScale)
         {
             VFXScale.transform.localScale = transform.lossyScale;
@@ -300,7 +305,7 @@ public class CubeScript : MonoBehaviour
         if (other.GetComponent<Rigidbody>())
         {
             //if (!areaObject || held)
-                //other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
+            //other.GetComponent<Rigidbody>().AddExplosionForce(100f, transform.position, transform.localScale.magnitude);
         }
     }
 

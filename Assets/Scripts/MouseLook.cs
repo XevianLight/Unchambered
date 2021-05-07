@@ -94,10 +94,14 @@ public class MouseLook : MonoBehaviour
     bool jointBreak = false;
     SpringJoint springJoint;
     public AnimationCurve mouseCurve;
+    public bool warping = false;
 
     public GameObject jointTarget;
     ConfigurableJoint configurableJoint;
     bool _inPortal = false;
+
+    Vector3 collisionPoint;
+    bool contact = false;
 
     // Start is called before the first frame update
     void Start()
@@ -155,6 +159,9 @@ public class MouseLook : MonoBehaviour
                 rb = heldObject.GetComponent<Rigidbody>();
                 //rb.useGravity = false;
                 rb.isKinematic = true;
+                //Vector3 worldPosition = heldObject.transform.TransformPoint(heldObject.transform.localPosition);
+                //heldObject.transform.parent = null;
+                //heldObject.transform.position = worldPosition;
                 /*springJoint = heldObject.AddComponent<SpringJoint>();
                 springJoint.autoConfigureConnectedAnchor = false;
                 springJoint.connectedBody = jointTarget.GetComponent<Rigidbody>();
@@ -221,6 +228,7 @@ public class MouseLook : MonoBehaviour
             {
                 if (!doWarp)
                 {
+                    //Debug.Log(doWarp);
                     portal = portalHit.collider.GetComponent<Portal>();
                     //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal, portal.targetPortal, heldObject.transform.position);
                     if (portalHit.transform.parent != heldObject)
@@ -228,6 +236,18 @@ public class MouseLook : MonoBehaviour
                         heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal, portal.targetPortal, heldObject.transform.rotation);
                         //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, heldObject.transform.localScale);
                         cs.defaultScale = Portal.TransformScaleBetweenPortals(portal, portal.targetPortal, cs.defaultScale);
+                        if (portal.transform.parent.name == "Portal Cube")
+                        {
+                            cs.roomPortal = portal.targetPortal;
+                        }
+                        else if (portal.transform.parent.name == "ProCube Room")
+                        {
+                            cs.roomPortal = null;
+                        }
+                        if (heldObject.GetComponent<ConstantForce>())
+                        {
+                            heldObject.GetComponent<ConstantForce>().force *= Portal.PortalScaleRatio(portal, portal.targetPortal);
+                        }
                     }
                     doWarp = true;
                 }
@@ -235,13 +255,27 @@ public class MouseLook : MonoBehaviour
             else
             {
                 //jointTarget.transform.rotation = heldObject.transform.rotation;
+
                 if (doWarp)
                 {
-
+                    //Debug.Log(doWarp);
+                    if (portal.transform.parent.name == "ProCube Room")
+                    {
+                        cs.roomPortal = portal;
+                    }
+                    else if (portal.transform.parent.name == "Portal Cube")
+                    {
+                        cs.roomPortal = null;
+                        Debug.Log("warp object held");
+                    }
                     //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
                     heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
                     //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
                     cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
+                    if (heldObject.GetComponent<ConstantForce>())
+                    {
+                        heldObject.GetComponent<ConstantForce>().force *= Portal.PortalScaleRatio(portal.targetPortal, portal);
+                    }
                     doWarp = false;
                 }
             }
@@ -276,11 +310,28 @@ public class MouseLook : MonoBehaviour
 
                 RaycastHit hit;
 
+                Vector3 rayDirection;
+                Vector3 rayDirectionUp;
+
+                rayDirection = Vector3.Slerp((heldPosition - cameraPosition).normalized, cameraDirection, cs.contractTime);
+                rayDirectionUp = Vector3.Slerp((heldPosition - cameraPosition).normalized, cam.transform.up, cs.contractTime);
+
+                //rayDirection = transform.TransformDirection(transform.InverseTransformDirection(rayDirection).ClampComponents(Mathf.NegativeInfinity, Mathf.Infinity, Mathf.NegativeInfinity, Mathf.Infinity, 0.8f, Mathf.Infinity)).normalized;
+
+                var rayAngle = Quaternion.LookRotation(rayDirection, rayDirectionUp).eulerAngles;
+
+                rayAngle = new Vector3(rayAngle.x, rayAngle.y, rayAngle.z);
+
+                rayDirection = Quaternion.Euler(rayAngle) * Vector3.forward;
+
+                Debug.Log((rayDirection));
+                Debug.DrawRay(cameraPosition, rayDirection, new Color(255, 0, 255), 1);
+
                 if (Portal.BoxcastRecursive(
                 cameraPosition,
                 heldObject.transform.lossyScale / 2,
                 //cs.scaling ? (heldPosition - cameraPosition).normalized : cameraDirection,
-                Vector3.Slerp((heldPosition - cameraPosition).normalized, cameraDirection, cs.contractTime),
+                rayDirection,
                 heldRotation,
                 range,
                 range,
@@ -308,9 +359,11 @@ public class MouseLook : MonoBehaviour
 
                     if (allowSnap)
                     {
+                        Debug.DrawRay(rotationVector.transform.position, rotationVector.transform.forward);
+                        var newPosition = finalPosition + (rotationVector.transform.forward * (hit.distance - 1));
                         heldObject.transform.position = Vector3.Lerp(
                             heldObject.transform.position,
-                            finalPosition + (rotationVector.transform.forward * (hit.distance - 1)),
+                            newPosition,
                             cs.expandCurve.Evaluate(1 / cs.scale));
                         //heldObject.transform.position = finalPosition + (rotationVector.transform.forward * hit.distance);
                     }
@@ -615,8 +668,6 @@ public class MouseLook : MonoBehaviour
         }*/
     }
 }
-
-
 
 //for if hit
 //heldObject.transform.position = Vector3.Lerp(heldObject.transform.position, Camera.main.transform.position + Camera.main.transform.forward* hit.distance, snapSpeed* Time.deltaTime / heldObject.transform.lossyScale.magnitude);
