@@ -32,7 +32,7 @@ public class Portal : MonoBehaviour
     private HashSet<PortalableObject> objectsInPortal = new HashSet<PortalableObject>();
     private HashSet<PortalableObject> objectsInPortalToRemove = new HashSet<PortalableObject>();
 
-    private HashSet<GameObject> objectsToClone = new HashSet<GameObject>();
+    private Dictionary<GameObject, GameObject> objectsToClone = new Dictionary<GameObject, GameObject>();
 
     public Portal[] visiblePortals;
 
@@ -569,14 +569,15 @@ public class Portal : MonoBehaviour
             }
         }
 
-        foreach (GameObject other in objectsToClone)
+        foreach (KeyValuePair<GameObject, GameObject> g in objectsToClone)
         {
-            if (GameObject.Find(other.name + " clone"))
+            if (g.Value)
             {
-                GameObject clone = GameObject.Find(other.name + " clone");
-                clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, other.transform.position);
-                clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, other.transform.rotation);
-                clone.transform.localScale = TransformScaleBetweenPortals(this, targetPortal, other.transform.lossyScale);
+                GameObject source = g.Key;
+                GameObject clone = g.Value;
+                clone.transform.position = TransformPositionBetweenPortals(this, targetPortal, source.transform.position);
+                clone.transform.rotation = TransformRotationBetweenPortals(this, targetPortal, source.transform.rotation);
+                clone.transform.localScale = TransformScaleBetweenPortals(this, targetPortal, source.transform.lossyScale);
             }
         }
     }
@@ -751,14 +752,13 @@ public class Portal : MonoBehaviour
                 objectsInPortal.Add(portalableObject);
             }
             Type[] components = { typeof(MeshFilter), typeof(MeshRenderer) };
-            GameObject clone = CloneWithComponents(other.gameObject, components);
-
+            GameObject clone = CloneWithComponents(other.gameObject, components, "visual clone");
+            if (!objectsToClone.ContainsKey(other.gameObject))
+            {
+                objectsToClone.Add(other.gameObject, clone);
+            }
         }
 
-        if (!objectsToClone.Contains(other.gameObject))
-        {
-            objectsToClone.Add(other.gameObject);
-        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -786,15 +786,11 @@ public class Portal : MonoBehaviour
             {
                 objectsInPortal.Remove(portalableObject);
             }
-            if (GameObject.Find(other.name + " clone"))
+            if (objectsToClone.TryGetValue(other.gameObject, out var value))
             {
-                GameObject clone = GameObject.Find(other.name + " clone");
-                Destroy(clone);
+                objectsToClone.Remove(other.gameObject);
+                Destroy(value);
             }
-        }
-        if (objectsToClone.Contains(other.gameObject))
-        {
-            objectsToClone.Remove(other.gameObject);
         }
     }
 
@@ -865,9 +861,9 @@ public class Portal : MonoBehaviour
         //vectorPlane = new Vector4(plane.normal.x, plane.normal.y, plane.normal.z, plane.distance);
     }
 
-    private GameObject CloneWithComponents(GameObject source, Type[] componentTypes)
+    public static GameObject CloneWithComponents(GameObject source, Type[] componentTypes, string typeIdentifier)
     {
-        GameObject cloneInternal = new GameObject(source.name + " clone");
+        GameObject cloneInternal = new GameObject(source.name + " " + typeIdentifier);
         CopyComponents(source, cloneInternal, componentTypes);
         cloneInternal.layer = 2;
         return cloneInternal;
@@ -877,15 +873,30 @@ public class Portal : MonoBehaviour
     {
         foreach (Type t in componentTypes)
         {
-            if (!target.GetComponent<MeshFilter>())
+            if (!target.GetComponent<MeshFilter>() && t == typeof(MeshFilter))
             {
                 MeshFilter meshFilter = target.AddComponent<MeshFilter>();
                 meshFilter.mesh = source.GetComponent<MeshFilter>().mesh;
+                //Debug.Log(t);
             }
-            if (!target.GetComponent<MeshRenderer>())
+            if (!target.GetComponent<MeshRenderer>() && t == typeof(MeshRenderer))
             {
                 MeshRenderer meshRenderer = target.AddComponent<MeshRenderer>();
                 meshRenderer.material = source.GetComponent<MeshRenderer>().material;
+                //Debug.Log(t);
+
+            }
+            if (!target.GetComponent<Light>() && t == typeof(Light))
+            {
+                Light light = target.AddComponent<Light>();
+                Light sourceLight = source.GetComponent<Light>();
+                light.intensity = sourceLight.intensity;
+                light.color = sourceLight.color;
+                light.type = sourceLight.type;
+                light.range = sourceLight.range;
+                light.shadows = sourceLight.shadows;
+                //Debug.Log(t);
+
             }
         }
     }

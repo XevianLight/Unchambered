@@ -60,6 +60,8 @@ public class CubeScript : MonoBehaviour
     public MouseLook mouseLook;
     public Portal roomPortal;
 
+    public float kinematicTime = 0;
+
 
 
     // Start is called before the first frame update
@@ -73,11 +75,16 @@ public class CubeScript : MonoBehaviour
         if (!childColliders)
             colliderObject = gameObject;
         audioSource = GetComponent<AudioSource>();
+        if (name != "Portal Cube")
+            name = "Cube " + Random.Range(100000, 999999).ToString();
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
+        if (rb)
+            kinematicTime = rb.isKinematic ? kinematicTime += Time.unscaledDeltaTime : 0;
+
         if (GetComponent<ConstantForce>())
         {
             GetComponent<ConstantForce>().force = roomPortal ? Physics.gravity * Portal.PortalScaleRatio(roomPortal.targetPortal, roomPortal) : Physics.gravity;

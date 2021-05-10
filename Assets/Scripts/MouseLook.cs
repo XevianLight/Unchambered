@@ -94,7 +94,10 @@ public class MouseLook : MonoBehaviour
     bool jointBreak = false;
     SpringJoint springJoint;
     public AnimationCurve mouseCurve;
+    public AnimationCurve lerp;
     public bool warping = false;
+    float x = 1f;
+    public float maxThrownVelocity = 10f;
 
     public GameObject jointTarget;
     ConfigurableJoint configurableJoint;
@@ -139,7 +142,8 @@ public class MouseLook : MonoBehaviour
 
             // Gets a velocity vector based on delta position and applies it to the rigidbody. Used for kinematic velocity.
             heldObjectVelocity = (heldObject.transform.position - heldObjectPositionOld) / Time.deltaTime;
-            rb.velocity = heldObjectVelocity;
+            if (rb)
+                rb.velocity = heldObjectVelocity;
         }
         else
         {
@@ -158,7 +162,8 @@ public class MouseLook : MonoBehaviour
                 cs = heldObject.GetComponent<CubeScript>();
                 rb = heldObject.GetComponent<Rigidbody>();
                 //rb.useGravity = false;
-                rb.isKinematic = true;
+                if (rb)
+                    rb.isKinematic = true;
                 //Vector3 worldPosition = heldObject.transform.TransformPoint(heldObject.transform.localPosition);
                 //heldObject.transform.parent = null;
                 //heldObject.transform.position = worldPosition;
@@ -226,6 +231,7 @@ public class MouseLook : MonoBehaviour
 
             if (rayCast)
             {
+                x += x < 100 ? 1 : 0;
                 if (!doWarp)
                 {
                     //Debug.Log(doWarp);
@@ -254,30 +260,54 @@ public class MouseLook : MonoBehaviour
             }
             else
             {
+                x -= x > 1 ? 1 : 0;
                 //jointTarget.transform.rotation = heldObject.transform.rotation;
 
                 if (doWarp)
                 {
                     //Debug.Log(doWarp);
-                    if (portal.transform.parent.name == "ProCube Room")
+                    if (portal)
                     {
-                        cs.roomPortal = portal;
-                    }
-                    else if (portal.transform.parent.name == "Portal Cube")
-                    {
-                        cs.roomPortal = null;
-                        Debug.Log("warp object held");
-                    }
-                    //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
-                    heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
-                    //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
-                    cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
-                    if (heldObject.GetComponent<ConstantForce>())
-                    {
-                        heldObject.GetComponent<ConstantForce>().force *= Portal.PortalScaleRatio(portal.targetPortal, portal);
+                        if (portal.transform.parent)
+                        {
+                            if (portal.transform.parent.name == "ProCube Room")
+                            {
+                                cs.roomPortal = portal;
+                            }
+                            else if (portal.transform.parent.name == "Portal Cube")
+                            {
+                                cs.roomPortal = null;
+                                Debug.Log("warp object held");
+                            }
+                        }
+
+                        //heldObject.transform.position = Portal.TransformPositionBetweenPortals(portal.targetPortal, portal, heldObject.transform.position);
+                        heldObject.transform.rotation = Portal.TransformRotationBetweenPortals(portal.targetPortal, portal, heldObject.transform.rotation);
+                        //heldObject.transform.localScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, heldObject.transform.localScale);
+                        cs.defaultScale = Portal.TransformScaleBetweenPortals(portal.targetPortal, portal, cs.defaultScale);
+                        if (heldObject.GetComponent<ConstantForce>())
+                        {
+                            heldObject.GetComponent<ConstantForce>().force *= Portal.PortalScaleRatio(portal.targetPortal, portal);
+                        }
                     }
                     doWarp = false;
                 }
+            }
+
+            rayCast = Physics.Raycast(
+                cameraPosition,
+                cameraDirection,
+                out portalHit,
+                range + heldObjectVelocity.magnitude,
+                1 << 16);
+
+            if (rayCast)
+            {
+                x += x < 100 ? 0.5f : 0;
+            }
+            else
+            {
+                x -= x > 1 ? 1 : 0;
             }
         }
 
@@ -324,7 +354,7 @@ public class MouseLook : MonoBehaviour
 
                 rayDirection = Quaternion.Euler(rayAngle) * Vector3.forward;
 
-                Debug.Log((rayDirection));
+                //Debug.Log((rayDirection));
                 Debug.DrawRay(cameraPosition, rayDirection, new Color(255, 0, 255), 1);
 
                 if (Portal.BoxcastRecursive(
@@ -364,7 +394,7 @@ public class MouseLook : MonoBehaviour
                         heldObject.transform.position = Vector3.Lerp(
                             heldObject.transform.position,
                             newPosition,
-                            cs.expandCurve.Evaluate(1 / cs.scale));
+                            lerp.Evaluate(Vector3.Distance(newPosition, heldObject.transform.position)) * x * snapSpeed * ((cs.contractTime / 2) < 1 ? cs.contractTime / 2 : 1));
                         //heldObject.transform.position = finalPosition + (rotationVector.transform.forward * hit.distance);
                     }
 
@@ -390,7 +420,7 @@ public class MouseLook : MonoBehaviour
                         heldObject.transform.position = Vector3.Lerp(
                             heldObject.transform.position,
                             endpoint,
-                            cs.expandCurve.Evaluate(1 / cs.scale));
+                            lerp.Evaluate(Vector3.Distance(endpoint, heldObject.transform.position)) * x * snapSpeed * ((cs.contractTime / 2) < 1 ? cs.contractTime / 2 : 1));
 
                         //heldObject.transform.position = endpoint;
                     }
@@ -417,7 +447,7 @@ public class MouseLook : MonoBehaviour
             {
                 // If so, apply calculated velocity, toggle its held state, disable kinematic
                 rb.isKinematic = false;
-                heldObjectVelocity = Vector3.ClampMagnitude(heldObjectVelocity, 10);
+                heldObjectVelocity = Vector3.ClampMagnitude(heldObjectVelocity, maxThrownVelocity);
                 rb.velocity = heldObjectVelocity;
                 //rb.useGravity = true;
                 cs.held = false;

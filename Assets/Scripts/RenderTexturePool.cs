@@ -11,6 +11,7 @@ public class RenderTexturePool : MonoBehaviour
 	private List<PoolItem> pool = new List<PoolItem>();
     
 	public Vector2 resolutionScale = new Vector2(1,1);
+    public Vector2 oldResolutionScale = new Vector2(1,1);
 
     private void Start()
     {
@@ -19,6 +20,16 @@ public class RenderTexturePool : MonoBehaviour
             //resolutionScale = new Vector2(0.25f, 0.25f);
         }
     }
+
+    private void Update()
+    {
+        if (oldResolutionScale != resolutionScale)
+        {
+            UpdateResolution();
+            oldResolutionScale = resolutionScale;
+        }
+    }
+
     private void Awake()
     {
         Instance = this;
@@ -78,7 +89,11 @@ public class RenderTexturePool : MonoBehaviour
         // As before, create a new RenderTexture with the full screen width and height.
         // Use .Create() to create it on the GPU as well.
         
-	    var newTexture = new RenderTexture(Mathf.RoundToInt(Screen.currentResolution.width * resolutionScale.x), Mathf.RoundToInt(Screen.currentResolution.height * resolutionScale.y), 24, RenderTextureFormat.DefaultHDR);
+	    var newTexture = new RenderTexture(
+            Mathf.RoundToInt(Screen.currentResolution.width * resolutionScale.x),
+            Mathf.RoundToInt(Screen.currentResolution.height * resolutionScale.y),
+            24,
+            RenderTextureFormat.DefaultHDR);
         //newTexture.width = Screen.currentResolution.width;
         newTexture.Create();
         //Debug.Log(newTexture);
@@ -100,6 +115,21 @@ public class RenderTexturePool : MonoBehaviour
         // Then Destroy() to remove it from Unity completely.
         if (item.Texture != null)
             Destroy(item.Texture);
+    }
+
+    public void UpdateResolution()
+    {
+        foreach(var poolItem in pool)
+        {
+            var newTexture = new RenderTexture(
+                Mathf.RoundToInt(Screen.currentResolution.width * resolutionScale.x),
+                Mathf.RoundToInt(Screen.currentResolution.height * resolutionScale.y),
+                24,
+                RenderTextureFormat.DefaultHDR);
+            newTexture.Create();
+            DestroyTexture(poolItem);
+            poolItem.Texture = newTexture;
+        }
     }
 
     private void OnDestroy()
